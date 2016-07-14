@@ -16,7 +16,7 @@ template
     ;
 
 content
-    : comment | javablock
+    : comment | javaBlock | args
     ;
 
 comment
@@ -24,8 +24,24 @@ comment
     | COMMENT_ML_START COMMENT_MULTI_LINE* MULTILINE_COMMENT_END
     ;
 
-javablock
+javaBlock
     : JAVA_BLOCK_START JAVA_BLOCK_CODE* JAVA_BLOCK_END
+    ;
+
+args
+    : ARGS_START templateArgument (COMMA templateArgument)*
+    ;
+
+identifier
+    : JAVALETTER JAVALETTERORDIGIT*
+    ;
+
+qualifiedName
+    : identifier (DOT identifier)*
+    ;
+
+templateArgument
+    : qualifiedName identifier
     ;
 
 
