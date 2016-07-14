@@ -23,4 +23,20 @@ public class ParserCommentTest extends TestBase {
         ParseTree pt = parser.template();
         assertEquals("(template (content (comment @* *@)) <EOF>)", pt.toStringTree(parser));
     }
+
+    @Test
+    public void testComment3() {
+        InputStream is = loadTemplate("comment/comment3.html");
+        RythmParser parser = createParser(is);
+        ParseTree pt = parser.template();
+        assertEquals("(template (content (comment @//  )) (content (comment @//  )) <EOF>)", pt.toStringTree(parser));
+    }
+
+    @Test
+    public void testComment4() {
+        InputStream is = loadTemplate("comment/comment4.html");
+        RythmParser parser = createParser(is);
+        ParseTree pt = parser.template();
+        assertEquals("(template (content (comment @* *@)) (content (comment @* *@)) <EOF>)", pt.toStringTree(parser));
+    }
 }
