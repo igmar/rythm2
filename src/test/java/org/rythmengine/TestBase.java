@@ -24,15 +24,14 @@ public class TestBase {
         return tpl;
     }
 
-    public ParseTree createParser(InputStream is) {
+    public RythmParser createParser(InputStream is) {
         try {
             CharStream input = new ANTLRInputStream(is);
             RythmLexer lexer = new RythmLexer(input);
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             RythmParser parser = new RythmParser(tokens);
-            ParseTree tree = parser.template();
 
-            return tree;
+            return parser;
         } catch (IOException e) {
             return null;
         }
