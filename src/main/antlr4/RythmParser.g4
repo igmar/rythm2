@@ -12,37 +12,32 @@ package org.rythmengine.internal.parser;
 options { tokenVocab=RythmLexer; }
 
 template
-    : content* EOF
+    : elements*
     ;
 
-content
-    : comment | javaBlock | args
+elements
+    : DOUBLE_AT
+    | CONTENT
+    | comment | javaBlock | args
     ;
 
 comment
-    : COMMENT_LINE_START COMMENT_LINE* LINE_COMMENT_END
-    | COMMENT_ML_START COMMENT_MULTI_LINE* MULTILINE_COMMENT_END
+    : AT COMMENT_LINE_START COMMENT_LINE* LINE_COMMENT_END
+    | AT COMMENT_ML_START COMMENT_MULTI_LINE* MULTILINE_COMMENT_END
     ;
 
 javaBlock
-    : JAVA_BLOCK_START JAVA_BLOCK_CODE* JAVA_BLOCK_END
+    : AT JAVA_BLOCK_START JAVA_BLOCK_CODE* JAVA_BLOCK_END
     ;
 
 args
-    : ARGS_START templateArgument (COMMA templateArgument)*
-    ;
-
-identifier
-    : JAVALETTER JAVALETTERORDIGIT*
+    : AT ARGS_START templateArgument (COMMA templateArgument)*
     ;
 
 qualifiedName
-    : identifier (DOT identifier)*
+    : IDENTIFIER (DOT IDENTIFIER)*
     ;
 
 templateArgument
-    : qualifiedName identifier
+    : qualifiedName IDENTIFIER
     ;
-
-
-

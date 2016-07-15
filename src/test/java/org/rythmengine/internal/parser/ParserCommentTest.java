@@ -1,6 +1,7 @@
 package org.rythmengine.internal.parser;
 
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.junit.Ignore;
 import org.rythmengine.internal.parser.RythmParser;
 import org.junit.Test;
 import org.rythmengine.TestBase;
@@ -13,7 +14,7 @@ public class ParserCommentTest extends TestBase {
         InputStream is = loadTemplate("comment/comment1.html");
         RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
-        assertEquals("(template (content (comment @//  )) <EOF>)", pt.toStringTree(parser));
+        assertEquals("(template (elements (comment @ // \\n)))", pt.toStringTree(parser));
     }
 
     @Test
@@ -21,7 +22,7 @@ public class ParserCommentTest extends TestBase {
         InputStream is = loadTemplate("comment/comment2.html");
         RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
-        assertEquals("(template (content (comment @* *@)) <EOF>)", pt.toStringTree(parser));
+        assertEquals("(template (elements (comment @ * *@)))", pt.toStringTree(parser));
     }
 
     @Test
@@ -29,7 +30,7 @@ public class ParserCommentTest extends TestBase {
         InputStream is = loadTemplate("comment/comment3.html");
         RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
-        assertEquals("(template (content (comment @//  )) (content (comment @//  )) <EOF>)", pt.toStringTree(parser));
+        assertEquals("(template (elements (comment @ // \\n)) (elements (comment @ // \\n)))", pt.toStringTree(parser));
     }
 
     @Test
@@ -37,6 +38,6 @@ public class ParserCommentTest extends TestBase {
         InputStream is = loadTemplate("comment/comment4.html");
         RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
-        assertEquals("(template (content (comment @* *@)) (content (comment @* *@)) <EOF>)", pt.toStringTree(parser));
+        assertEquals("(template (elements (comment @ * *@)) (elements (comment @ * *@)))", pt.toStringTree(parser));
     }
 }
