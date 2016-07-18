@@ -36,4 +36,18 @@ public class TestBase {
             return null;
         }
     }
+
+    public String loadFile(String file) {
+        InputStream tpl = this.getClass().getClassLoader().getResourceAsStream(file);
+        if (tpl == null) {
+            return null;
+        }
+
+        try {
+            String content = IOUtils.toString(tpl, "UTF-8");
+            return content;
+        } catch (IOException e) {
+            return null;
+        }
+    }
 }

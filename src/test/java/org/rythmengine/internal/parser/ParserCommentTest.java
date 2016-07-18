@@ -12,32 +12,37 @@ public class ParserCommentTest extends TestBase {
     @Test
     public void testComment1() {
         InputStream is = loadTemplate("comment/comment1.html");
+        String expected = loadFile("comment/comment1.html.exp");
         RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
-        assertEquals("(template (elements (comment @ // \\n)))", pt.toStringTree(parser));
+        System.out.println(String.format("'%s' -> '%s'", pt.toStringTree(parser), expected));
+        assertEquals(expected, pt.toStringTree(parser));
     }
 
     @Test
     public void testComment2() {
         InputStream is = loadTemplate("comment/comment2.html");
+        String expected = loadFile("comment/comment2.html.exp");
         RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
-        assertEquals("(template (elements (comment @ * *@)))", pt.toStringTree(parser));
+        assertEquals(expected, pt.toStringTree(parser));
     }
 
     @Test
     public void testComment3() {
         InputStream is = loadTemplate("comment/comment3.html");
+        String expected = loadFile("comment/comment3.html.exp");
         RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
-        assertEquals("(template (elements (comment @ // \\n)) (elements (comment @ // \\n)))", pt.toStringTree(parser));
+        assertEquals(expected, pt.toStringTree(parser));
     }
 
     @Test
     public void testComment4() {
         InputStream is = loadTemplate("comment/comment4.html");
+        String expected = loadFile("comment/comment4.html.exp");
         RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
-        assertEquals("(template (elements (comment @ * *@)) (elements (comment @ * *@)))", pt.toStringTree(parser));
+        assertEquals(expected, pt.toStringTree(parser));
     }
 }
