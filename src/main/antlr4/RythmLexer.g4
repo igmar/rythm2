@@ -14,6 +14,8 @@ channels { TemplateComment, TemplateData, JavaCode }
 
 AT:                         '@'           -> mode(RYTHM);
 DOUBLE_AT:                  '@@'          ;
+CURLY_OPEN:                 '{'           ;
+CURLY_CLOSE:                '}'           ;
 CONTENT:                    .             -> channel(TemplateData);
 
 mode RYTHM;
@@ -21,6 +23,12 @@ COMMENT_LINE_START:         '//'          -> mode(LINE_COMMENT);
 COMMENT_ML_START:           '*'           -> mode(MULTILINE_COMMENT);
 ARGS_START:                 'args'        ;
 JAVA_BLOCK_START:           '{'           -> mode(JAVA_BLOCK);
+IF_BLOCK_START:             'if'          ;
+FOR_BLOCK_START:            'for'         ;
+PARENTHESIS_OPEN:           '('           ;
+PARENTHESIS_CLOSE:          ')'           ;
+ELSE:                       'else'        ;
+RETURN:                     'return'      ;
 EOL:                        [\r\n]        -> channel(HIDDEN);
 WS:                         [\t ]         -> channel(HIDDEN);
 COMMA:                      ','           ;

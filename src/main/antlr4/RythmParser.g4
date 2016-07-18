@@ -18,7 +18,27 @@ template
 elements
     : DOUBLE_AT
     | CONTENT
-    | comment | javaBlock | args
+    | comment | javaBlock | args | flow_if | flow_for
+    ;
+
+flow_if
+    : AT IF_BLOCK_START boolExpression block (ELSE block)?
+    ;
+
+flow_for
+    : AT FOR_BLOCK_START boolExpression block
+    ;
+
+block
+    : CURLY_OPEN CURLY_CLOSE
+    ;
+
+boolExpression
+    : PARENTHESIS_OPEN expression PARENTHESIS_CLOSE
+    ;
+
+expression
+    :
     ;
 
 comment
