@@ -38,7 +38,8 @@ boolExpression
     ;
 
 expression
-    :
+    : BOOL_TRUE
+    | BOOL_FALSE
     ;
 
 comment
@@ -47,7 +48,7 @@ comment
     ;
 
 javaBlock
-    : AT JAVA_BLOCK_START JAVA_BLOCK_CODE* JAVA_BLOCK_END
+    : AT CURLY_OPEN JAVA_BLOCK_CODE* CURLY_CLOSE
     ;
 
 args
