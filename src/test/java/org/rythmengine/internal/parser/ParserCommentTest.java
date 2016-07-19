@@ -15,7 +15,6 @@ public class ParserCommentTest extends TestBase {
         String expected = loadFile("comment/comment1.html.exp");
         RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
-        System.out.println(String.format("'%s' -> '%s'", pt.toStringTree(parser), expected));
         assertEquals(expected, pt.toStringTree(parser));
     }
 
