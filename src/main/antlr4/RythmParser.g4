@@ -18,7 +18,7 @@ template
 elements
     : DOUBLE_AT
     | CONTENT
-    | comment | javaBlock | args | flow_if | flow_for
+    | comment | javaBlock | args | flow_if | flow_for | outputExpression
     ;
 
 flow_if
@@ -27,6 +27,19 @@ flow_if
 
 flow_for
     : AT FOR_BLOCK_START forExpression block
+    ;
+
+outputExpression
+    : OE instanceAccess
+    ;
+
+instanceAccess
+    : OE_IDENTIFIER
+    | OE_IDENTIFIER OE_PARENTHESIS_OPEN oeMethodArguments* OE_PARENTHESIS_CLOSE
+    ;
+
+oeMethodArguments
+    : OE_IDENTIFIER (OE_COMMA OE_IDENTIFIER)*
     ;
 
 block
