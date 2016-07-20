@@ -1,1 +1,1 @@
-(template (elements (flow_if @ if (boolExpression ( (expression true) )) (block { }))))
+(template (elements (flow_if @ if (boolExpression ( (expression (primary (literal (booleanLiteral true)))) )) (block { }))))

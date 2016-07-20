@@ -10,22 +10,22 @@ import java.io.InputStream;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by igmar on 18/07/16.
+ * Created by igmar on 19/07/16.
  */
-public class FlowIfTest extends TestBase {
+public class FlowForTest extends TestBase {
     @Test
-    public void testEmptyBlock() {
-        InputStream is = loadTemplate("flow_if/flow_if1.html");
-        String expected = loadFile("flow_if/flow_if1.html.exp");
+    public void testSimpleFor() {
+        InputStream is = loadTemplate("flow_for/flow_for1.html");
+        String expected = loadFile("flow_for/flow_for1.html.exp");
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
         assertEquals(expected, pt.toStringTree(parser));
     }
 
     @Test
-    public void testSimpleIf() {
-        InputStream is = loadTemplate("flow_if/flow_if2.html");
-        String expected = loadFile("flow_if/flow_if2.html.exp");
+    public void testEnhancedFor() {
+        InputStream is = loadTemplate("flow_for/flow_for2.html");
+        String expected = loadFile("flow_for/flow_for2.html.exp");
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
         assertEquals(expected, pt.toStringTree(parser));

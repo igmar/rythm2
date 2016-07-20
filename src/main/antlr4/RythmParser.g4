@@ -26,11 +26,26 @@ flow_if
     ;
 
 flow_for
-    : AT FOR_BLOCK_START boolExpression block
+    : AT FOR_BLOCK_START forExpression block
     ;
 
 block
     : CURLY_OPEN CURLY_CLOSE
+    ;
+
+forExpression
+    : PARENTHESIS_OPEN qualifiedName IDENTIFIER COLON IDENTIFIER PARENTHESIS_CLOSE
+    | PARENTHESIS_OPEN integralType variableDeclarator SEMICOLON expression SEMICOLON expression PARENTHESIS_CLOSE
+    ;
+
+
+variableDeclarator
+    : IDENTIFIER EQUALS expression
+    ;
+
+integralType
+    : LONG
+    | INTEGER
     ;
 
 boolExpression
@@ -38,8 +53,107 @@ boolExpression
     ;
 
 expression
+    : primary
+    | expression incDecOperator
+    | prefixOperator expression
+    | expression ( LT LT | GT GT GT | GT GT ) expression
+    | expression ( LTE | GTE | LT | GT ) expression
+    | expression ( EQUALTO | NOTEQUALTO ) expression
+    | expression AND expression
+    | expression OR expression
+    | expression BAND expression
+    | expression BOR expression
+    | <assoc=right> expression (
+       EQUALS
+       | ADDASSIGN
+       | MINUSASSIGN
+       | MULTASSIGN
+       | DIVASSIGN
+       | ANDASSIGN
+       | ORASSIGN
+       | XORASSIGN
+       | SHLASSIGN
+       | SHRASSIGN
+       | SHRZASSIGN
+    ) expression
+    ;
+
+incDecOperator
+    : INCREMENT
+    | DECREMENT
+    ;
+
+prefixOperator
+    : PLUS
+    | MINUS
+    | INCREMENT
+    | DECREMENT
+    | NEGATE
+    | COMPLEMENT
+    ;
+
+primary
+    : literal
+    | IDENTIFIER
+    ;
+
+literal
+    : integerLiteral
+    | booleanLiteral
+    | NULL
+    ;
+
+integerLiteral
+    : decimalIntegerLiteral
+    | hexIntegerLiteral
+    ;
+
+booleanLiteral
     : BOOL_TRUE
     | BOOL_FALSE
+    ;
+
+decimalIntegerLiteral
+    : decimalNumeral integerTypeSuffix?
+    ;
+
+decimalNumeral
+    : ZERO
+    | NONZERO (digits? | underScores digits)
+    ;
+
+digits
+    : digit (digitOrUnderscore* digit)?
+    ;
+
+digitOrUnderscore
+    : digit
+    | UNDERSCORE
+    ;
+
+digit
+    : ZERO
+    | NONZERO
+    ;
+
+underScores
+    : UNDERSCORE+
+    ;
+
+hexIntegerLiteral
+    : hexNumeral integerTypeSuffix?
+    ;
+
+hexNumeral
+    : ZERO HEXPREFIX hexDigits
+    ;
+
+hexDigits
+    :
+    ;
+
+integerTypeSuffix
+    : INTEGER_TYPE_SUFFIX
     ;
 
 comment
