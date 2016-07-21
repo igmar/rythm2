@@ -89,12 +89,17 @@ WS:                         [\t ]                       -> channel(HIDDEN);
 IDENTIFIER:                 [a-zA-Z$_][a-zA-Z0-9$_]*    ;
 
 mode OUTPUT_EXPRESSION;
-OE_PARENTHESIS_OPEN:        '('                         ;
-OE_PARENTHESIS_CLOSE:       ')'                         ;
+OE_ARGS_PARENTHESIS_OPEN:   '('                         -> pushMode(OUTPUT_EXPRESSION_ARGS);
 OE_COMMA:                   ','                         ;
 OE_DOT:                     '.'                         ;
 OE_IDENTIFIER:              [a-zA-Z$_][a-zA-Z0-9$_]*    ;
 OE_END:                     [ \t\r\n]+                  -> mode(DEFAULT_MODE);
+
+mode OUTPUT_EXPRESSION_ARGS;
+OE_ARGS_IDENTIFIER:         [a-zA-Z$_][a-zA-Z0-9$_]*    ;
+OE_ARGS_COMMA:              ','                         ;
+OE_ARGS_WS:                 [ \t\r\n]+                  -> channel(HIDDEN);
+OE_ARGS_PARENTHESIS_CLOSE:  ')'                         -> popMode;
 
 mode LINE_COMMENT;
 LINE_COMMENT_END:           [\r\n]                      -> mode(DEFAULT_MODE);
