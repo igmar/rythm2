@@ -19,6 +19,7 @@ public class FlowIfTest extends TestBase {
         String expected = loadFile("flow_if/flow_if1.html.exp");
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals(expected, pt.toStringTree(parser));
     }
 
@@ -28,6 +29,7 @@ public class FlowIfTest extends TestBase {
         String expected = loadFile("flow_if/flow_if2.html.exp");
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals(expected, pt.toStringTree(parser));
     }
 }

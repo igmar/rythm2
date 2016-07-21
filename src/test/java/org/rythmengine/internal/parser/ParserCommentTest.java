@@ -15,6 +15,7 @@ public class ParserCommentTest extends TestBase {
         String expected = loadFile("comment/comment1.html.exp");
         RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals(expected, pt.toStringTree(parser));
     }
 
@@ -24,6 +25,7 @@ public class ParserCommentTest extends TestBase {
         String expected = loadFile("comment/comment2.html.exp");
         RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals(expected, pt.toStringTree(parser));
     }
 
@@ -33,6 +35,7 @@ public class ParserCommentTest extends TestBase {
         String expected = loadFile("comment/comment3.html.exp");
         RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals(expected, pt.toStringTree(parser));
     }
 
@@ -42,6 +45,7 @@ public class ParserCommentTest extends TestBase {
         String expected = loadFile("comment/comment4.html.exp");
         RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals(expected, pt.toStringTree(parser));
     }
 }

@@ -14,22 +14,32 @@ import static org.junit.Assert.assertEquals;
  */
 public class ExpressionTest extends TestBase {
     @Test
-    @Ignore
     public void testInstanceField() {
         InputStream is = loadTemplate("expression/expression1.html");
         String expected = loadFile("expression/expression1.html.exp");
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals(expected, pt.toStringTree(parser));
     }
 
     @Test
-    @Ignore
     public void testInstanceMethod() {
         InputStream is = loadTemplate("expression/expression2.html");
         String expected = loadFile("expression/expression2.html.exp");
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
+        assertEquals(expected, pt.toStringTree(parser));
+    }
+
+    @Test
+    public void testCInstanceMethod() {
+        InputStream is = loadTemplate("expression/expression3.html");
+        String expected = loadFile("expression/expression3.html.exp");
+        org.rythmengine.internal.parser.RythmParser parser = createParser(is);
+        ParseTree pt = parser.template();
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals(expected, pt.toStringTree(parser));
     }
 }
