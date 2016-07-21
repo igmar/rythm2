@@ -15,6 +15,7 @@ package org.rythmengine.internal.parser;
     int curly_nesting = 0;
     int parenthesis_nesting = 0;
     boolean coe_started = false;
+    boolean return_if_started = false;
 }
 
 channels { TemplateComment, TemplateData, JavaCode }
@@ -31,6 +32,8 @@ COMMENT_ML_START:           '*'                         -> mode(MULTILINE_COMMEN
 ARGS_START:                 'args'                      -> mode(RYTHM);
 IF_BLOCK_START:             'if'                        { block_nesting++; } -> mode(RYTHM);
 FOR_BLOCK_START:            'for'                       { block_nesting++; } -> mode(RYTHM);
+RETURN_START:               'return'                    -> mode(DEFAULT_MODE);
+RETURN_IF_START:            'returnIf('                 { return_if_started = true; } -> mode(RYTHM);
 OE_START:                   [a-zA-Z][a-zA-Z0-9$_]*      -> mode(OUTPUT_EXPRESSION);
 
 mode RYTHM;
@@ -38,6 +41,7 @@ COLON:                      ':'                         ;
 SEMICOLON:                  ';'                         ;
 CURLY_OPEN:                 '{'                         { curly_nesting++; } -> mode(DEFAULT_MODE);
 COE_END:                    ')'                         { coe_started && parenthesis_nesting == 0 }? { coe_started = false; } -> mode(DEFAULT_MODE);
+RETURN_IF_END:              ')'                         { return_if_started && parenthesis_nesting == 0}? { return_if_started = false; } -> mode(DEFAULT_MODE);
 PARENTHESIS_OPEN:           '('                         { parenthesis_nesting++; };
 PARENTHESIS_CLOSE:          ')'                         { parenthesis_nesting--; };
 ELSE:                       'else'                      ;

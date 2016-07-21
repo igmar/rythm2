@@ -18,7 +18,7 @@ template
 elements
     : DOUBLE_AT
     | CONTENT
-    | comment | javaBlock | args | flow_if | flow_for | outputExpression
+    | comment | javaBlock | args | flow_if | flow_for | outputExpression | flow_return
     ;
 
 flow_if
@@ -35,6 +35,11 @@ outputExpression
     | AT COE_START IDENTIFIER DOT IDENTIFIER PARENTHESIS_OPEN methodArguments* PARENTHESIS_CLOSE COE_END
     ;
 
+flow_return
+    : AT RETURN_START
+    | AT RETURN_IF_START expression RETURN_IF_END
+    ;
+
 oeMethodArguments
     : OE_ARGS_IDENTIFIER (OE_ARGS_COMMA OE_ARGS_IDENTIFIER)*
     ;
@@ -44,7 +49,7 @@ methodArguments
     ;
 
 block
-    : CURLY_OPEN CURLY_CLOSE
+    : CURLY_OPEN elements* CURLY_CLOSE
     ;
 
 forExpression
