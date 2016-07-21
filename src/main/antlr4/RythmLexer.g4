@@ -93,7 +93,7 @@ OE_ARGS_PARENTHESIS_OPEN:   '('                         -> pushMode(OUTPUT_EXPRE
 OE_COMMA:                   ','                         ;
 OE_DOT:                     '.'                         ;
 OE_IDENTIFIER:              [a-zA-Z$_][a-zA-Z0-9$_]*    ;
-OE_END:                     [ \t\r\n]+                  -> mode(DEFAULT_MODE);
+OE_END:                     .                           -> mode(DEFAULT_MODE);
 
 mode OUTPUT_EXPRESSION_ARGS;
 OE_ARGS_IDENTIFIER:         [a-zA-Z$_][a-zA-Z0-9$_]*    ;
