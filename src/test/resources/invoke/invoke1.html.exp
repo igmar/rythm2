@@ -1,0 +1,1 @@
+(template (elements (include @ include ( " (canonicalName foo . bar) " ))))

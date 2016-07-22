@@ -18,7 +18,7 @@ template
 elements
     : DOUBLE_AT
     | CONTENT
-    | comment | javaBlock | args | flow_if | flow_for | outputExpression | flow_return
+    | comment | javaBlock | args | flow_if | flow_for | outputExpression | flow_return | macro | include
     ;
 
 flow_if
@@ -30,18 +30,26 @@ flow_for
     ;
 
 outputExpression
-    : AT OE_START DOT outputExpressionCanonical OE_END
-    | AT OE_START DOT outputExpressionCanonical PARENTHESIS_OPEN methodArguments* PARENTHESIS_CLOSE OE_END
-    | AT COE_START IDENTIFIER DOT outputExpressionCanonical PARENTHESIS_OPEN methodArguments* PARENTHESIS_CLOSE COE_END
+    : AT OE_START DOT canonicalName OE_END
+    | AT OE_START DOT canonicalName PARENTHESIS_OPEN methodArguments* PARENTHESIS_CLOSE OE_END
+    | AT COE_START IDENTIFIER DOT canonicalName PARENTHESIS_OPEN methodArguments* PARENTHESIS_CLOSE COE_END
     ;
 
-outputExpressionCanonical
+canonicalName
     : IDENTIFIER (DOT IDENTIFIER)*
     ;
 
 flow_return
     : AT RETURN_START
     | AT RETURN_IF_START expression RETURN_IF_END
+    ;
+
+macro
+    : AT MACRO_BLOCK_START PARENTHESIS_OPEN DOUBLE_QUOTE? canonicalName DOUBLE_QUOTE? PARENTHESIS_CLOSE block
+    ;
+
+include
+    : AT INCLUDE_START PARENTHESIS_OPEN DOUBLE_QUOTE? canonicalName DOUBLE_QUOTE? PARENTHESIS_CLOSE
     ;
 
 methodArguments

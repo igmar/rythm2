@@ -1,1 +1,1 @@
-(template (elements (outputExpression @ ( foo . (outputExpressionCanonical bar) ( ) ))))
+(template (elements (outputExpression @ ( foo . (canonicalName bar) ( ) ))))
