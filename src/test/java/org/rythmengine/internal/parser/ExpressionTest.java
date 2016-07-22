@@ -62,4 +62,14 @@ public class ExpressionTest extends TestBase {
         assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals(expected, pt.toStringTree(parser));
     }
+
+    @Test
+    public void testInstanceFieldMethodWithArgs() {
+        InputStream is = loadTemplate("expression/expression6.html");
+        String expected = loadFile("expression/expression6.html.exp");
+        org.rythmengine.internal.parser.RythmParser parser = createParser(is);
+        ParseTree pt = parser.template();
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
+        assertEquals(expected, pt.toStringTree(parser));
+    }
 }
