@@ -22,6 +22,7 @@ public class FlowInvokeTest extends TestBase {
         assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals(expected, pt.toStringTree(parser));
     }
+
     @Test
     public void testMacro() {
         InputStream is = loadTemplate("invoke/invoke2.html");

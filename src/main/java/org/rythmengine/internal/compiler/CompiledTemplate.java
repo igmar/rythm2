@@ -1,11 +1,20 @@
 package org.rythmengine.internal.compiler;
 
-public final class CompiledTemplate implements AutoCloseable {
+import org.rythmengine.internal.IHttpContext;
+
+public final class CompiledTemplate {
+    private String source;
+    private String hash;
+
     public String path() {
         return "";
     }
 
-    @Override
-    public void close() throws Exception {
+    public String hash() {
+        return hash;
+    }
+
+    public String execute(IHttpContext context) {
+        return "";
     }
 }

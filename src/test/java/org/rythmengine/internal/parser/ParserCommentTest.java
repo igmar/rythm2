@@ -5,7 +5,9 @@ import org.junit.Ignore;
 import org.rythmengine.internal.parser.RythmParser;
 import org.junit.Test;
 import org.rythmengine.TestBase;
+
 import java.io.InputStream;
+
 import static org.junit.Assert.assertEquals;
 
 public class ParserCommentTest extends TestBase {
