@@ -30,26 +30,18 @@ flow_for
     ;
 
 outputExpression
-    : AT OE_START OE_DOT outputExpressionCanonical OE_END
-    | AT OE_START OE_DOT outputExpressionCanonical OE_ARGS_PARENTHESIS_OPEN oeMethodArguments* OE_ARGS_PARENTHESIS_CLOSE OE_END
-    | AT COE_START IDENTIFIER DOT coutputExpressionCanonical PARENTHESIS_OPEN methodArguments* PARENTHESIS_CLOSE COE_END
+    : AT OE_START DOT outputExpressionCanonical OE_END
+    | AT OE_START DOT outputExpressionCanonical PARENTHESIS_OPEN methodArguments* PARENTHESIS_CLOSE OE_END
+    | AT COE_START IDENTIFIER DOT outputExpressionCanonical PARENTHESIS_OPEN methodArguments* PARENTHESIS_CLOSE COE_END
     ;
 
 outputExpressionCanonical
-    : OE_IDENTIFIER (OE_DOT OE_IDENTIFIER)*
-    ;
-
-coutputExpressionCanonical
     : IDENTIFIER (DOT IDENTIFIER)*
     ;
 
 flow_return
     : AT RETURN_START
     | AT RETURN_IF_START expression RETURN_IF_END
-    ;
-
-oeMethodArguments
-    : OE_ARGS_IDENTIFIER (OE_ARGS_COMMA OE_ARGS_IDENTIFIER)*
     ;
 
 methodArguments

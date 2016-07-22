@@ -1,1 +1,1 @@
-(template (elements (outputExpression @ foo . (outputExpressionCanonical xxx . bar) ( (oeMethodArguments hello , miel) )  )))
+(template (elements (outputExpression @ foo . (outputExpressionCanonical xxx . bar) ( (methodArguments hello , miel) )  )))
