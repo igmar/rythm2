@@ -5,10 +5,13 @@ import org.rythmengine.conf.RythmConfiguration;
 import org.rythmengine.conf.RythmEngineMode;
 import org.rythmengine.internal.IHttpContext;
 import org.rythmengine.internal.ILogger;
+import org.rythmengine.internal.IResourceLoader;
 import org.rythmengine.internal.compiler.CompiledTemplate;
 import org.rythmengine.internal.compiler.jdk7.JDK7TemplateCompiler;
 import org.rythmengine.internal.exceptions.RythmCompileException;
+import org.rythmengine.internal.generator.ISourceGenerator;
 import org.rythmengine.internal.hash.fnv.FNV;
+import org.rythmengine.internal.logger.Logger;
 import org.rythmengine.internal.parser.ParsedTemplate;
 import org.rythmengine.internal.parser.TemplateParser;
 
@@ -35,10 +38,13 @@ public final class RythmEngine implements AutoCloseable {
     private ExecutorService parsePool;
     private ConcurrentMap<String, CompiledTemplate> templates;
     private ILogger iLogger;
+    private ISourceGenerator sourceGenerator;
 
     public RythmEngine(final RythmConfiguration configuration) {
         this.configuration = configuration;
         this.id = configuration.getId();
+        //this.iLogger = Logger.get(RythmEngine.class);
+        this.sourceGenerator = configuration.getSourceGeneratorProvider().get();
         compilePool = Executors.newCachedThreadPool();
         parsePool = Executors.newCachedThreadPool();
         templates = new ConcurrentHashMap<>();
@@ -83,7 +89,8 @@ public final class RythmEngine implements AutoCloseable {
                 }
             }
         } catch (IOException | InterruptedException | ExecutionException | TimeoutException e) {
-            throw new RythmCompileException();
+            final String msg = String.format("Compilation of '%s' failed.", identifier);
+            throw new RythmCompileException(msg, e);
         }
     }
 
@@ -108,7 +115,8 @@ public final class RythmEngine implements AutoCloseable {
     }
 
     private CompiledTemplate compileTemplate(InputStream is) throws InterruptedException, java.util.concurrent.ExecutionException, java.util.concurrent.TimeoutException {
-        Future<ParsedTemplate> parseFuture = parsePool.submit(new TemplateParser(this.configuration.getResourceLoaderProvider(), is));
+        IResourceLoader resourceLoader = this.configuration.getResourceLoaderProvider().get();
+        Future<ParsedTemplate> parseFuture = parsePool.submit(new TemplateParser(sourceGenerator, resourceLoader, is));
         ParsedTemplate pt = parseFuture.get(5, TimeUnit.SECONDS);
         Future<CompiledTemplate> compileFuture = compilePool.submit(new JDK7TemplateCompiler(pt));
         CompiledTemplate ct = compileFuture.get(5, TimeUnit.SECONDS);

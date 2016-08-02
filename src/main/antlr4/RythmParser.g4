@@ -7,9 +7,20 @@ parser grammar RythmParser;
 
 @header {
 package org.rythmengine.internal.parser;
+import org.rythmengine.internal.IResourceLoader;
 }
 
 options { tokenVocab=RythmLexer; }
+
+@parser::members {
+    private IResourceLoader resourceLoader;
+    private List<String> args = new ArrayList<>();
+    private List<String> macros = new ArrayList<>();
+
+    public void setResourceLoader(IResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
+    }
+}
 
 template
     : elements*

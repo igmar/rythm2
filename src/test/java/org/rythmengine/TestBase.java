@@ -3,17 +3,15 @@ package org.rythmengine;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.commons.io.IOUtils;
+import org.rythmengine.conf.RythmConfiguration;
+import org.rythmengine.conf.RythmEngineMode;
 import org.rythmengine.internal.parser.RythmLexer;
 import org.rythmengine.internal.parser.RythmParser;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * Created by igmar on 14/07/16.
- */
 public class TestBase {
     public InputStream loadTemplate(String template) {
         InputStream tpl = this.getClass().getClassLoader().getResourceAsStream(template);
@@ -49,5 +47,15 @@ public class TestBase {
         } catch (IOException e) {
             return "";
         }
+    }
+
+    public RythmConfiguration createRythmConfiguration() {
+        RythmConfiguration configuration = new RythmConfiguration.Builder()
+                .engineMode(RythmEngineMode.DEV)
+                .homeDir("/tmp")
+                .tempDir("/tmp")
+                .writeEnabled(true)
+                .build();
+        return configuration;
     }
 }

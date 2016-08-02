@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.rythmengine.internal.ILogger;
 import org.rythmengine.internal.IResourceLoader;
 import org.rythmengine.internal.exceptions.RythmConfigException;
-import org.rythmengine.internal.generator.DefaultSourceLoaderProvider;
+import org.rythmengine.internal.generator.DefaultSourceGeneratorProvider;
 import org.rythmengine.internal.generator.ISourceGenerator;
 import org.rythmengine.internal.logger.JDKLogger;
 import org.rythmengine.internal.logger.Logger;
@@ -86,10 +86,11 @@ public final class RythmConfiguration {
             this.writeEnabled = true;
             this.engineMode = RythmEngineMode.DEV;
             // FIXME : can throw a NPE
-            this.homedir = new File(Thread.currentThread().getContextClassLoader().getResource("rythm").getFile());
+            //this.homedir = new File(Thread.currentThread().getContextClassLoader().getResource("rythm").getFile());
+            this.homedir = new File("/tmp");
             this.tempdir = new File(System.getProperty("java.io.tmpdir"), "__rythm");
             this.resourceLoaderProvider = new DefaultResourceLoaderProvider();
-            this.sourceGeneratorProvider = new DefaultSourceLoaderProvider();
+            this.sourceGeneratorProvider = new DefaultSourceGeneratorProvider();
             Logger.register(JDKLogger.class);
         }
 
@@ -114,32 +115,30 @@ public final class RythmConfiguration {
         }
 
         public Builder homeDir(String homeDir) {
-            // FIXME : Have an exception with a useful message
             if (StringUtils.isEmpty(homeDir)) {
-                throw new RythmConfigException();
+                throw new RythmConfigException("homedir is empty");
             }
             this.homedir = new File(homeDir);
             if (!this.homedir.exists()) {
-                throw new RythmConfigException();
+                throw new RythmConfigException("homedir does not exist");
             }
             if ((!this.homedir.isDirectory())) {
-                throw new RythmConfigException();
+                throw new RythmConfigException("homedir is not a directory");
             }
 
             return this;
         }
 
         public Builder tempDir(String tempDir) {
-            // FIXME : Have an exception with a useful message
             if (StringUtils.isEmpty(tempDir)) {
-                throw new RythmConfigException();
+                throw new RythmConfigException("tempdir is empty");
             }
             this.tempdir = new File(tempDir);
             if (!this.tempdir.exists()) {
-                throw new RythmConfigException();
+                throw new RythmConfigException("tempdir does not exist");
             }
             if ((!this.tempdir.isDirectory())) {
-                throw new RythmConfigException();
+                throw new RythmConfigException("tempdir is not a directory");
             }
 
             return this;
@@ -147,7 +146,7 @@ public final class RythmConfiguration {
 
         public Builder resourceLoaderProvider(Provider<IResourceLoader> provider) {
             if (provider == null) {
-                throw new RythmConfigException();
+                throw new RythmConfigException("resourceloader is null");
             }
             this.resourceLoaderProvider = provider;
             return this;
@@ -155,7 +154,7 @@ public final class RythmConfiguration {
 
         public Builder withLogger(ILogger logger) {
             if (logger == null) {
-                throw new RythmConfigException();
+                throw new RythmConfigException("logger is null");
             }
             Logger.register(logger);
             return this;
@@ -163,7 +162,7 @@ public final class RythmConfiguration {
 
         public Builder sourceGeneratorProvider(Provider<ISourceGenerator> provider) {
             if (provider == null) {
-                throw new RythmConfigException();
+                throw new RythmConfigException("sourcegenerator provider is null");
             }
             this.sourceGeneratorProvider = provider;
             return this;
