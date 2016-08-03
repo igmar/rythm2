@@ -76,6 +76,13 @@ forExpression
     | PARENTHESIS_OPEN integralType variableDeclarator SEMICOLON expression SEMICOLON expression PARENTHESIS_CLOSE
     ;
 
+args
+    : AT ARGS_START templateArgument (COMMA templateArgument)* ARGS_END
+    ;
+
+templateArgument
+    : qualifiedName IDENTIFIER
+    ;
 
 variableDeclarator
     : IDENTIFIER EQUALS expression
@@ -203,14 +210,8 @@ javaBlock
     : AT CURLY_OPEN JAVA_BLOCK_CODE* CURLY_CLOSE
     ;
 
-args
-    : AT ARGS_START templateArgument (COMMA templateArgument)*
-    ;
+
 
 qualifiedName
     : IDENTIFIER (DOT IDENTIFIER)*
-    ;
-
-templateArgument
-    : qualifiedName IDENTIFIER
     ;

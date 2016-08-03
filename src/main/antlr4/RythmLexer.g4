@@ -16,6 +16,7 @@ package org.rythmengine.internal.parser;
     int parenthesis_nesting = 0;
     boolean coe_started = false;
     boolean return_if_started = false;
+    boolean args_started = false;
 }
 
 channels { TemplateComment, TemplateData, JavaCode }
@@ -29,7 +30,7 @@ mode OPERATOR;
 COE_START:                  '('                         { coe_started = true; } -> mode(RYTHM);
 COMMENT_LINE_START:         '//'                        -> mode(LINE_COMMENT);
 COMMENT_ML_START:           '*'                         -> mode(MULTILINE_COMMENT);
-ARGS_START:                 'args'                      -> mode(RYTHM);
+ARGS_START:                 'args'                      { args_started = true; } -> mode(RYTHM);
 IF_BLOCK_START:             'if'                        { block_nesting++; } -> mode(RYTHM);
 FOR_BLOCK_START:            'for'                       { block_nesting++; } -> mode(RYTHM);
 INCLUDE_START:              'include'                   -> mode(RYTHM);
@@ -91,7 +92,8 @@ NONZERO:                    [1-9]                       ;
 HEXPREFIX:                  [xX]                        ;
 HEXDIGIT:                   [0-9a-fA-F]                 ;
 UNDERSCORE:                 '_'                         ;
-EOL:                        [\r\n]                      -> channel(HIDDEN);
+ARGS_END:                   [\r\n]                      { args_started }? -> mode(DEFAULT_MODE);
+EOL:                        [\r\n]                      ;
 WS:                         [\t ]                       -> channel(HIDDEN);
 IDENTIFIER:                 [a-zA-Z$_][a-zA-Z0-9$_]*    ;
 

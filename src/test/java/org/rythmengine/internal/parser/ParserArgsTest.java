@@ -20,6 +20,8 @@ public class ParserArgsTest extends TestBase {
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
         assertEquals(0, parser.getNumberOfSyntaxErrors());
+        System.out.println(expected);
+        System.out.println(pt.toStringTree(parser));
         assertEquals(expected, pt.toStringTree(parser));
     }
 
@@ -37,6 +39,16 @@ public class ParserArgsTest extends TestBase {
     public void testArgs3() {
         InputStream is = loadTemplate("args/args3.html");
         String expected = loadFile("args/args3.html.exp");
+        org.rythmengine.internal.parser.RythmParser parser = createParser(is);
+        ParseTree pt = parser.template();
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
+        assertEquals(expected, pt.toStringTree(parser));
+    }
+
+    @Test
+    public void testArgs4() {
+        InputStream is = loadTemplate("args/args4.html");
+        String expected = loadFile("args/args4.html.exp");
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
         assertEquals(0, parser.getNumberOfSyntaxErrors());

@@ -1,1 +1,1 @@
-(template (elements (args @ args (templateArgument (qualifiedName FooBar) myfoobar))))
+(template (elements (args @ args (templateArgument (qualifiedName FooBar) myfoobar) \n)))
