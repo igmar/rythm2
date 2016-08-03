@@ -92,8 +92,8 @@ NONZERO:                    [1-9]                       ;
 HEXPREFIX:                  [xX]                        ;
 HEXDIGIT:                   [0-9a-fA-F]                 ;
 UNDERSCORE:                 '_'                         ;
-ARGS_END:                   [\r\n]                      { args_started }? -> mode(DEFAULT_MODE);
-EOL:                        [\r\n]                      ;
+ARGS_END:                   [\r\n]                      { args_started }? { args_started = false; }-> mode(DEFAULT_MODE);
+EOL:                        [\r\n]                      -> channel(HIDDEN);
 WS:                         [\t ]                       -> channel(HIDDEN);
 IDENTIFIER:                 [a-zA-Z$_][a-zA-Z0-9$_]*    ;
 
