@@ -20,8 +20,6 @@ public class ParserArgsTest extends TestBase {
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        System.out.println(expected);
-        System.out.println(pt.toStringTree(parser));
         assertEquals(expected, pt.toStringTree(parser));
     }
 
