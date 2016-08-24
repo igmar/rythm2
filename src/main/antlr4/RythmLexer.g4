@@ -8,6 +8,9 @@ lexer grammar RythmLexer;
 
 @lexer::header {
 package org.rythmengine.internal.parser;
+import org.rythmengine.internal.debug.AntlrDebug;
+import java.util.List;
+import java.util.ArrayList;
 }
 
 @lexer::members {
@@ -17,6 +20,26 @@ package org.rythmengine.internal.parser;
     boolean coe_started = false;
     boolean return_if_started = false;
     boolean args_started = false;
+    List<Token> tokens = new ArrayList<>();
+
+    public void emit(Token token) {
+        super.emit(token);
+
+        if (token.getChannel() == Token.DEFAULT_CHANNEL) {
+            tokens.add(token);
+        }
+    }
+
+    private boolean previous_is_parenthesis_close() {
+        if (tokens.size() == 0) {
+            return false;
+        }
+        Token t = tokens.get(tokens.size() - 1);
+        if (t.getType() == RythmLexer.CURLY_CLOSE) {
+            return true;
+        }
+        return false;
+    }
 }
 
 channels { TemplateComment, TemplateData, JavaCode }
@@ -24,6 +47,8 @@ channels { TemplateComment, TemplateData, JavaCode }
 AT:                         '@'                         -> mode(OPERATOR);
 DOUBLE_AT:                  '@@'                        -> channel(TemplateData);
 CURLY_CLOSE:                '}'                         { block_nesting > 0 && block_nesting >= curly_nesting }? { curly_nesting--; block_nesting--; };
+NORMAL_ELSE:                'else'                      { previous_is_parenthesis_close() }? { block_nesting++; tokens.clear(); setType(ELSE); } -> mode(RYTHM);
+NWS:                        [\t\r\n ]+                  { setType(WS); } -> channel(HIDDEN);
 CONTENT:                    .                           -> channel(TemplateData);
 
 mode OPERATOR;
@@ -37,7 +62,7 @@ INCLUDE_START:              'include'                   -> mode(RYTHM);
 MACRO_BLOCK_START:          'macro'                     { block_nesting++; } -> mode(RYTHM);
 RETURN_START:               'return'                    -> mode(DEFAULT_MODE);
 RETURN_IF_START:            'returnIf('                 { return_if_started = true; } -> mode(RYTHM);
-OE_START:                   [a-zA-Z][a-zA-Z0-9$_]*      -> mode(OUTPUT_EXPRESSION);
+OE_START:                   [a-zA-Z][a-zA-Z0-9$_]+      -> mode(OUTPUT_EXPRESSION);
 
 mode RYTHM;
 COLON:                      ':'                         ;
@@ -95,17 +120,17 @@ UNDERSCORE:                 '_'                         ;
 ARGS_END:                   [\r\n]                      { args_started }? { args_started = false; }-> mode(DEFAULT_MODE);
 EOL:                        [\r\n]                      -> channel(HIDDEN);
 WS:                         [\t ]                       -> channel(HIDDEN);
-IDENTIFIER:                 [a-zA-Z$_][a-zA-Z0-9$_]*    ;
+IDENTIFIER:                 [a-zA-Z$_][a-zA-Z0-9$_]+    ;
 
 mode OUTPUT_EXPRESSION;
 OE_ARGS_PARENTHESIS_OPEN:   '('                         { setType(PARENTHESIS_OPEN); } -> pushMode(OUTPUT_EXPRESSION_ARGS);
 OE_COMMA:                   ','                         { setType(COMMA); };
 OE_DOT:                     '.'                         { setType(DOT); };
-OE_IDENTIFIER:              [a-zA-Z$_][a-zA-Z0-9$_]*    { setType(IDENTIFIER); };
+OE_IDENTIFIER:              [a-zA-Z$_][a-zA-Z0-9$_]+    { setType(IDENTIFIER); };
 OE_END:                     .                           -> mode(DEFAULT_MODE);
 
 mode OUTPUT_EXPRESSION_ARGS;
-OE_ARGS_IDENTIFIER:         [a-zA-Z$_][a-zA-Z0-9$_]*    { setType(IDENTIFIER); };
+OE_ARGS_IDENTIFIER:         [a-zA-Z$_][a-zA-Z0-9$_]+    { setType(IDENTIFIER); };
 OE_ARGS_COMMA:              ','                         { setType(COMMA); };
 OE_ARGS_WS:                 [ \t\r\n]+                  -> channel(HIDDEN);
 OE_ARGS_PARENTHESIS_CLOSE:  ')'                         { setType(PARENTHESIS_CLOSE); } -> popMode;

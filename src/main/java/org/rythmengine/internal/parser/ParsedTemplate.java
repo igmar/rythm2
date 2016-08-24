@@ -8,18 +8,21 @@ import org.rythmengine.internal.exceptions.RythmTemplateException;
 import org.rythmengine.internal.generator.ISourceGenerator;
 
 public final class ParsedTemplate {
+    private String path;
     private ParseTree pt;
     private TokenStream tokenStream;
     private ISourceGenerator sourceGenerator;
     private String source;
     private String generatedSource;
 
-    public ParsedTemplate(final ISourceGenerator sourceGenerator, final ParseTree pt, TokenStream tokenstream, final String source) throws RythmGenerateException {
+    public ParsedTemplate(final String identifier, final ISourceGenerator sourceGenerator, final ParseTree pt, TokenStream tokenstream, final String source) throws RythmGenerateException {
+        assert identifier != null;
         assert sourceGenerator != null;
         assert pt != null;
         assert source != null;
         assert tokenstream != null;
 
+        this.path = identifier;
         this.pt = pt;
         this.tokenStream = tokenstream;
         this.sourceGenerator = sourceGenerator;
@@ -39,7 +42,7 @@ public final class ParsedTemplate {
     }
 
     private String generateTemplateSource() throws RythmGenerateException {
-        this.generatedSource = sourceGenerator.generateSource(pt, tokenStream);
+        this.generatedSource = sourceGenerator.generateSource(path, pt, tokenStream);
         if (this.generatedSource == null) {
             throw new RythmParserException("Failed to generate sources");
         }

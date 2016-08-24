@@ -8,6 +8,7 @@ import org.rythmengine.TestBase;
 import java.io.InputStream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * Created by igmar on 18/07/16.
@@ -41,5 +42,25 @@ public class FlowIfTest extends TestBase {
         ParseTree pt = parser.template();
         assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals(expected, pt.toStringTree(parser));
+    }
+
+    @Test
+    public void testElse() {
+        InputStream is = loadTemplate("flow_if/flow_if4.html");
+        String expected = loadFile("flow_if/flow_if4.html.exp");
+        org.rythmengine.internal.parser.RythmParser parser = createParser(is);
+        ParseTree pt = parser.template();
+        System.out.println(pt.toStringTree(parser));
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
+        assertEquals(expected, pt.toStringTree(parser));
+    }
+
+    @Test
+    public void testBadElse() {
+        InputStream is = loadTemplate("flow_if/flow_if5.html");
+        org.rythmengine.internal.parser.RythmParser parser = createParser(is);
+        ParseTree pt = parser.template();
+        System.out.println(pt.toStringTree(parser));
+        assertEquals(1, parser.getNumberOfSyntaxErrors());
     }
 }

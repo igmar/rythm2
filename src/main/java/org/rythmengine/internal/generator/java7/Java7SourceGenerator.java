@@ -1,76 +1,70 @@
 package org.rythmengine.internal.generator.java7;
 
-import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.apache.commons.io.IOUtils;
 import org.rythmengine.internal.ILogger;
 import org.rythmengine.internal.exceptions.RythmGenerateException;
+import org.rythmengine.internal.exceptions.RythmParserException;
 import org.rythmengine.internal.generator.ISourceGenerator;
 import org.rythmengine.internal.logger.Logger;
+import org.rythmengine.internal.parser.RythmLexer;
+import org.rythmengine.internal.parser.RythmParser;
+import org.rythmengine.internal.parser.RythmParserBaseListener;
+
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-/**
- * Created by igmar on 22/07/16.
- */
 public class Java7SourceGenerator implements ISourceGenerator {
     private static ILogger logger = Logger.get(Java7SourceGenerator.class);
+    private Map<String, String> drainFunctions;
+    private List<String> macros;
+    private Map<String, Class<?>> args;
+
+    public Java7SourceGenerator() {
+        drainFunctions = new HashMap<>();
+        macros = new ArrayList<>();
+        args = new HashMap<>();
+
+    }
 
     @Override
-    public String generateSource(ParseTree pt, TokenStream tokenStream) throws RythmGenerateException {
+    public String generateSource(String identifier, ParseTree pt, TokenStream tokenStream) throws RythmGenerateException {
+        assert identifier != null;
         assert pt != null;
-        final StringBuffer sb = new StringBuffer();
+        final StringBuffer flowsb = new StringBuffer();
         logger.info("generateSource()");
-        processNode(sb, pt, tokenStream);
+
+        ParseTreeWalker walker = new ParseTreeWalker();
+        Java7Listener listener = new Java7Listener(flowsb, tokenStream);
+        walker.walk(listener, pt);
+
+        final String imports = generateImports();
+        final String className = generateClassName(identifier);
+        final String drains = generateDrains();
+
+        final String template = loadTemplate()
+                .replace("@@IMPORTS@@", imports)
+                .replace("@@CLASSNAME@@", className)
+                .replace("@@FLOW@@", flowsb.toString())
+                .replace("@@DRAINS@@", drains);
+
+        System.out.println(template);
 
         return null;
     }
 
-    private void processNode(final StringBuffer sb, final Object node, TokenStream tokenStream) throws RythmGenerateException {
-        logger.info("Processing type '%s'", node.getClass().getCanonicalName());
-        if (node instanceof Token) {
-            Token t = (Token) node;
-            System.out.println(dumpToken(t));
-        } else if (node instanceof RuleContext) {
-            RuleContext rc = (RuleContext) node;
-            System.out.println(dumpRuleContext(rc));
-            for (int i = 0; i < rc.getChildCount(); i++) {
-                processNode(sb, rc.getChild(i), tokenStream);
-            }
-            processRuleContext(sb, rc, tokenStream);
-        } else if (node instanceof TerminalNode) {
-            TerminalNode tn = (TerminalNode) node;
-            System.out.println(dumpTerminalNode(tn));
-        }
-        else {
-            final String msg = String.format("Node is a '%s', we can't process that", node.getClass().getCanonicalName());
-            throw new RythmGenerateException(msg);
-        }
-    }
-
-    private <U extends RuleContext> void processRuleContext(final StringBuffer sb, final U rc, final TokenStream tokenStream) {
-        final String className = rc.getClass().getSimpleName();
-
-        switch (className) {
-            case "TemplateContext":
-                // Start of the template
-                break;
-            case "ElementsContext":
-                break;
-            case "Flow_ifContext":
-            case "Flow_forContext":
-                //dumpRuleContext(rc);
-                break;
-            default:
-                //System.out.println(String.format("Ignoring '%s'", className));
-                break;
-        }
-
+    private String generateClassName(String path) {
+        return String.format("ct_%s", path.replace("/", "_").replace(".", "_"));
     }
 
     private String loadTemplate() throws RythmGenerateException {
@@ -86,47 +80,112 @@ public class Java7SourceGenerator implements ISourceGenerator {
         }
     }
 
-    private String dumpTerminalNode(TerminalNode tn) {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("--> TERMNALNODE : ").append(tn.hashCode()).append("\n");
-        sb.append("class           : ").append(tn.getClass().getSimpleName()).append("\n");
-        sb.append("source interval : ").append(tn.getSourceInterval()).append("\n");
-        sb.append("text            : ").append(tn.getText()).append("\n");
-        sb.append("child count     : ").append(tn.getChildCount()).append("\n");
-        sb.append("symbol          : ").append(tn.getSymbol()).append("\n");
-        sb.append("<-- TERMNALNODE : ").append(tn.hashCode()).append("\n");
-        return sb.toString();
+    private String generateImports() {
+        StringBuilder tsb = new StringBuilder();
+        for (Map.Entry<String, Class<?>> entry : args.entrySet()) {
+            tsb.append("import ").append(entry.getValue().getCanonicalName()).append(";\n");
+        }
+        return tsb.toString();
     }
 
-    private String dumpRuleContext(RuleContext rc) {
-        final StringBuilder sb = new StringBuilder();
+    private String generateDrains() {
+        StringBuilder tsb = new StringBuilder();
 
-        sb.append("--> RULECONTEXT : ").append(rc.hashCode()).append("\n");
-        sb.append("class           : ").append(rc.getClass().getSimpleName()).append("\n");
-        sb.append("depth           : ").append(rc.depth()).append("\n");
-        sb.append("alt number      : ").append(rc.getAltNumber()).append("\n");
-        sb.append("child count     : ").append(rc.getChildCount()).append("\n");
-        sb.append("rule index      : ").append(rc.getRuleIndex()).append("\n");
-        sb.append("text            : ").append(rc.getText()).append("\n");
-        sb.append("source interval : ").append(rc.getSourceInterval()).append("\n");
-        sb.append("<-- RULECONTEXT : ").append(rc.hashCode()).append("\n");
-        return sb.toString();
+        for (Map.Entry<String, String> entry : drainFunctions.entrySet()) {
+            tsb.append("private void ").append(entry.getKey()).append("() {\n");
+            tsb.append("\t\tsb.append(\"").append(entry.getValue()).append("\");\n");
+            tsb.append("\t}\n");
+        }
+
+        return tsb.toString();
     }
 
-    private String dumpToken(Token t) {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("--> TOKEN      : ").append(t.hashCode()).append("\n");
-        sb.append("class          : ").append(t.getClass().getSimpleName()).append("\n");
-        sb.append("channel        : ").append(t.getChannel()).append("\n");
-        sb.append("line           : ").append(t.getLine()).append("\n");
-        sb.append("linepos        : ").append(t.getCharPositionInLine()).append("\n");
-        sb.append("start idx      : ").append(t.getStartIndex()).append("\n");
-        sb.append("stop  idx      : ").append(t.getStopIndex()).append("\n");
-        sb.append("token idx      : ").append(t.getTokenIndex()).append("\n");
-        sb.append("type           : ").append(t.getType()).append("\n");
-        sb.append("text           : ").append(t.getText()).append("\n");
-        sb.append("<-- TOKEN      : ").append(t.hashCode()).append("\n");
 
-        return sb.toString();
+    private class Java7Listener extends RythmParserBaseListener {
+        private StringBuffer sb;
+        private TokenStream tokenStream;
+        private int contentStart = 0;
+
+        public Java7Listener(StringBuffer sb, TokenStream tokenStream) {
+            this.sb = sb;
+            this.tokenStream = tokenStream;
+        }
+
+        @Override
+        public void enterElements(RythmParser.ElementsContext ctx) {
+            drainContentNodes(ctx);
+        }
+
+        @Override
+        public void enterDoubleat(RythmParser.DoubleatContext ctx) {
+            sb.append("emitAt();\n");
+        }
+
+        @Override
+        public void enterArgs(RythmParser.ArgsContext ctx) {
+            /*
+             * This handles the @args : We parse those,
+             * lookup the class, and put the result in the args map
+             */
+            for (RythmParser.TemplateArgumentContext arg : ctx.templateArgument()) {
+                final Token type = arg.getStart();
+                final TerminalNode name = arg.IDENTIFIER();
+                final Class<?> typeRef;
+                final String fqn = getClassName(type.getText());
+
+                try {
+                    typeRef = Class.forName(fqn);
+                } catch (ClassNotFoundException e) {
+                    throw new RythmParserException(e);
+                }
+                args.put(name.getText(), typeRef);
+            }
+        }
+
+        @Override
+        public void enterFlow_if(RythmParser.Flow_ifContext ctx) {
+            sb.append("\tif ").append(ctx.boolExpression().getText()).append(" {\n");
+            sb.append("\t}\n");
+            sb.append("CNT : ").append(ctx.block().size());
+        }
+
+        /*
+         * Helper methods
+         */
+        private void drainContentNodes(final RythmParser.ElementsContext ctx) {
+            final Token start = ctx.getStart();
+            final StringBuilder tsb = new StringBuilder();
+            int inc = 0;
+            int end = start.getTokenIndex();
+            int linestart = -1;
+            for (int i = contentStart; i <= end; i++, inc++) {
+                Token t = tokenStream.get(i);
+                if (t.getTokenIndex() == start.getTokenIndex())
+                    continue;
+                if (t.getChannel() != RythmLexer.TemplateData)
+                    continue;
+                if (t.getType() != RythmLexer.CONTENT)
+                    break;
+                if (linestart == -1)
+                    linestart = t.getLine();
+                tsb.append(t.getText().replace("\r", "\\r").replace("\n", "\\n"));
+            }
+            if (tsb.length() > 0) {
+                final String functionName = String.format("drain_%s", linestart);
+                drainFunctions.put(functionName, tsb.toString());
+                sb.append(functionName).append("();\n");
+            }
+        }
+
+        /*
+         * FIXME
+         */
+        private String getClassName(String text) {
+            if (!text.contains(".")) {
+                return "java.lang." + text;
+            } else {
+                return text;
+            }
+        }
     }
 }

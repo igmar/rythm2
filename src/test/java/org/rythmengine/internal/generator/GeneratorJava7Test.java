@@ -1,5 +1,6 @@
 package org.rythmengine.internal.generator;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.TestBase;
@@ -8,6 +9,7 @@ import org.rythmengine.internal.compiler.CompiledTemplate;
 
 import java.io.InputStream;
 
+@Ignore
 public class GeneratorJava7Test extends TestBase {
     @Test
     public void generatorTest1() {

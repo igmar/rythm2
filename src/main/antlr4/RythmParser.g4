@@ -14,8 +14,6 @@ options { tokenVocab=RythmLexer; }
 
 @parser::members {
     private IResourceLoader resourceLoader;
-    private List<String> args = new ArrayList<>();
-    private List<String> macros = new ArrayList<>();
 
     public void setResourceLoader(IResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
@@ -27,9 +25,20 @@ template
     ;
 
 elements
+    : doubleat
+    | comment
+    | javaBlock
+    | args
+    | flow_if
+    | flow_for
+    | outputExpression
+    | flow_return
+    | macro
+    | include
+    ;
+
+doubleat
     : DOUBLE_AT
-    | CONTENT
-    | comment | javaBlock | args | flow_if | flow_for | outputExpression | flow_return | macro | include
     ;
 
 flow_if

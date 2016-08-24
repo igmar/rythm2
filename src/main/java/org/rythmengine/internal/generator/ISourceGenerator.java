@@ -8,5 +8,5 @@ import org.rythmengine.internal.exceptions.RythmGenerateException;
  * Created by igmar on 22/07/16.
  */
 public interface ISourceGenerator {
-    String generateSource(ParseTree pt, TokenStream tokenStream) throws RythmGenerateException;
+    String generateSource(String path, ParseTree pt, TokenStream tokenStream) throws RythmGenerateException;
 }

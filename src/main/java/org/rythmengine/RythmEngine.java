@@ -75,7 +75,7 @@ public final class RythmEngine implements AutoCloseable {
     public CompiledTemplate compile(final String identifier, final InputStream input) throws RythmCompileException {
         try {
             if (!templates.containsKey(identifier)) {
-                return compileTemplate(input);
+                return compileTemplate(identifier, input);
             } else {
                 if (configuration.getEngineMode().equals(RythmEngineMode.DEV)) {
                     String inputHash = getHash(input);
@@ -83,7 +83,7 @@ public final class RythmEngine implements AutoCloseable {
                     if (ct.path().equals(inputHash)) {
                         return ct;
                     }
-                    return compileTemplate(input);
+                    return compileTemplate(identifier, input);
                 } else {
                     return templates.get(identifier);
                 }
@@ -114,9 +114,9 @@ public final class RythmEngine implements AutoCloseable {
         }
     }
 
-    private CompiledTemplate compileTemplate(InputStream is) throws InterruptedException, java.util.concurrent.ExecutionException, java.util.concurrent.TimeoutException {
+    private CompiledTemplate compileTemplate(String identifier, InputStream is) throws InterruptedException, java.util.concurrent.ExecutionException, java.util.concurrent.TimeoutException {
         IResourceLoader resourceLoader = this.configuration.getResourceLoaderProvider().get();
-        Future<ParsedTemplate> parseFuture = parsePool.submit(new TemplateParser(sourceGenerator, resourceLoader, is));
+        Future<ParsedTemplate> parseFuture = parsePool.submit(new TemplateParser(identifier, sourceGenerator, resourceLoader, is));
         ParsedTemplate pt = parseFuture.get(5, TimeUnit.SECONDS);
         Future<CompiledTemplate> compileFuture = compilePool.submit(new JDK7TemplateCompiler(pt));
         CompiledTemplate ct = compileFuture.get(5, TimeUnit.SECONDS);

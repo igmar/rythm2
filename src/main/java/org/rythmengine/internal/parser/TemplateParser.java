@@ -17,19 +17,21 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Callable;
 
 public final class TemplateParser implements Callable<ParsedTemplate> {
+    private String identifier;
     private org.rythmengine.internal.parser.RythmParser parser;
     private ParseTree pt;
     private String source;
     private IResourceLoader resourceLoader;
     private ISourceGenerator sourceGenerator;
     private InputStream is;
-    private TokenStream tokenstream;
 
-    public TemplateParser(final ISourceGenerator sourceGenerator, final IResourceLoader resourceLoader, final InputStream template) {
+    public TemplateParser(final String identifier, final ISourceGenerator sourceGenerator, final IResourceLoader resourceLoader, final InputStream template) {
+        assert identifier != null;
         assert sourceGenerator != null;
         assert resourceLoader != null;
         assert template != null;
 
+        this.identifier = identifier;
         this.sourceGenerator = sourceGenerator;
         this.resourceLoader = resourceLoader;
         this.is = template;
@@ -42,11 +44,9 @@ public final class TemplateParser implements Callable<ParsedTemplate> {
             throw new RythmParserException("FIXME : Syntax error");
         }
         this.pt = parser.template();
-        this.tokenstream = parser.getTokenStream();
-
+        final TokenStream tokenstream = parser.getTokenStream();
         // FIXME : We need to get the list of parsed templates from the parser
-
-        return new ParsedTemplate(sourceGenerator, pt, tokenstream, this.source);
+        return new ParsedTemplate(identifier, sourceGenerator, pt, tokenstream, this.source);
     }
 
     private org.rythmengine.internal.parser.RythmParser createParser(String input, IResourceLoader resourceLoader) throws IOException {
