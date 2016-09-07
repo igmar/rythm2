@@ -9,7 +9,6 @@ import org.rythmengine.internal.compiler.CompiledTemplate;
 
 import java.io.InputStream;
 
-@Ignore
 public class GeneratorJava7Test extends TestBase {
     @Test
     public void generatorTest1() {
@@ -17,6 +16,7 @@ public class GeneratorJava7Test extends TestBase {
         RythmEngine engine = new RythmEngine(config);
 
         InputStream is = loadTemplate("generator/generator1.html");
+        System.out.println("Loaded ");
         String expected = loadFile("generator/generator1.java");
 
         CompiledTemplate result = engine.compile("generator/generator1.html", is);
