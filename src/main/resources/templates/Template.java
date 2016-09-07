@@ -13,12 +13,12 @@ public final class @@CLASSNAME@@ extends TemplateBase {
 
     @Override
     public String execute(IHttpContext context) {
-        @@FLOW@@
+@@FLOW@@
     }
 
     private void emitAt() {
         sb.append("@");
     }
 
-    @@DRAINS@@
+@@DRAINS@@
 }
