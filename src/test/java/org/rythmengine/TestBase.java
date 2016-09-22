@@ -43,7 +43,7 @@ public class TestBase {
 
         try {
             String content = IOUtils.toString(tpl, "UTF-8");
-            return content;
+            return content.replace("\n", "").replace("\r", "");
         } catch (IOException e) {
             return "FILE_NOT_FOUND";
         }
