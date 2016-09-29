@@ -9,6 +9,7 @@ import org.rythmengine.internal.compiler.CompiledTemplate;
 
 import java.io.InputStream;
 
+@Ignore
 public class GeneratorJava7Test extends TestBase {
     @Test
     public void generatorTest1() {
