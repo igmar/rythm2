@@ -1,1 +1,1 @@
-(template (elements (comment @ // \n)) (elements (comment @ // \n)))
+(template (elements (templatedata (templatedataelement And some text on the top\n\n))) (elements (comment @ // \n)) (elements (templatedata (templatedataelement \n))) (elements (comment @ // \n)) (elements (templatedata (templatedataelement \nThis is just some extra text, to make sure it passes\n))))

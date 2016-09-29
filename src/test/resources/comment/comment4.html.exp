@@ -1,1 +1,1 @@
-(template (elements (comment @ * *@)) (elements (comment @ * *@)))
+(template (elements (comment @ * *@)) (elements (templatedata (templatedataelement \n\nSome template text\n\n))) (elements (comment @ * *@)) (elements (templatedata (templatedataelement \n))))

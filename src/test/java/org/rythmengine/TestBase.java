@@ -1,16 +1,14 @@
 package org.rythmengine;
 
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.apache.commons.io.IOUtils;
 import org.rythmengine.conf.RythmConfiguration;
 import org.rythmengine.conf.RythmEngineMode;
-import org.rythmengine.internal.parser.RythmLexer;
 import org.rythmengine.internal.parser.RythmParser;
+import org.rythmengine.internal.parser.TemplateParser;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 
 public class TestBase {
     public InputStream loadTemplate(String template) {
@@ -24,13 +22,12 @@ public class TestBase {
 
     public RythmParser createParser(InputStream is) {
         try {
-            CharStream input = new ANTLRInputStream(is);
-            RythmLexer lexer = new RythmLexer(input);
-            CommonTokenStream tokens = new CommonTokenStream(lexer);
-            RythmParser parser = new RythmParser(tokens);
-
-            return parser;
-        } catch (IOException e) {
+            final TemplateParser templateParser = new TemplateParser("unittests", new TestGenerator(), new TestResourceLoader(), is);
+            Field field = templateParser.getClass().getDeclaredField("parser");
+            field.setAccessible(true);
+            return (RythmParser) field.get(templateParser);
+        } catch (IOException | NoSuchFieldException | IllegalAccessException e) {
+            System.out.println(String.format("Exception : %s", e));
             return null;
         }
     }

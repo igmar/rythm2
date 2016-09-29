@@ -1,1 +1,1 @@
-(template (elements (outputExpression @ ( foo . (canonicalName bar) ( (methodArguments hello , miel) ) ))))
+(template (elements (templatedata (templatedataelement Some text\n))) (elements (outputExpression @ ( foo . (canonicalName bar) ( (methodArguments hello , miel) ) ))) (elements (templatedata (templatedataelement more text\nFoo text\n))))

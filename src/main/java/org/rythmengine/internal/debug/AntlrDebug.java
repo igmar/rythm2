@@ -3,7 +3,11 @@ package org.rythmengine.internal.debug;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.codehaus.plexus.util.StringUtils;
 import org.rythmengine.internal.parser.RythmLexer;
+
+import java.util.List;
 
 public final class AntlrDebug {
     private AntlrDebug() {}
@@ -48,6 +52,18 @@ public final class AntlrDebug {
         sb.append("type           : ").append(RythmLexer.VOCABULARY.getSymbolicName(t.getType())).append("\n");
         sb.append("text           : '").append(t.getText()).append("'\n");
         sb.append("<-- TOKEN      : ").append(t.hashCode()).append("\n");
+
+        return sb.toString();
+    }
+
+    public static String dumpTokens(List<Token> tokens) {
+        final StringBuilder sb = new StringBuilder();
+
+        for (Token t : tokens) {
+            if (t.getType() == -1)
+                break;
+            sb.append(String.format("<%s(%s) %s '%s'> ", t.getType(), RythmLexer.ruleNames[t.getType() - 1], t.getChannel() == RythmLexer.HIDDEN ? "H" : "N", StringEscapeUtils.escapeJava(t.getText())));
+        }
 
         return sb.toString();
     }

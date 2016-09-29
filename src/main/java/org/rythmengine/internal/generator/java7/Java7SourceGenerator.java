@@ -5,16 +5,14 @@ import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.apache.commons.io.IOUtils;
 import org.rythmengine.internal.ILogger;
 import org.rythmengine.internal.exceptions.RythmGenerateException;
 import org.rythmengine.internal.exceptions.RythmParserException;
 import org.rythmengine.internal.generator.ISourceGenerator;
 import org.rythmengine.internal.logger.Logger;
-import org.rythmengine.internal.parser.RythmLexer;
 import org.rythmengine.internal.parser.RythmParser;
 import org.rythmengine.internal.parser.RythmParserBaseListener;
-
-import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -92,7 +90,7 @@ public class Java7SourceGenerator implements ISourceGenerator {
         StringBuilder tsb = new StringBuilder();
 
         for (Map.Entry<String, String> entry : drainFunctions.entrySet()) {
-            tsb.append("private void ").append(entry.getKey()).append("() {\n");
+            tsb.append("\tprivate void ").append(entry.getKey()).append("() {\n");
             tsb.append("\t\tsb.append(\"").append(entry.getValue()).append("\");\n");
             tsb.append("\t}\n");
         }
@@ -113,12 +111,7 @@ public class Java7SourceGenerator implements ISourceGenerator {
 
         @Override
         public void enterElements(RythmParser.ElementsContext ctx) {
-            drainContentNodes(ctx);
-        }
 
-        @Override
-        public void enterDoubleat(RythmParser.DoubleatContext ctx) {
-            sb.append("emitAt();\n");
         }
 
         @Override
@@ -145,36 +138,19 @@ public class Java7SourceGenerator implements ISourceGenerator {
         @Override
         public void enterFlow_if(RythmParser.Flow_ifContext ctx) {
             sb.append("\tif ").append(ctx.boolExpression().getText()).append(" {\n");
-            sb.append("\t}\n");
-            sb.append("CNT : ").append(ctx.block().size());
+            sb.append(ctx.block().get(0).getText());
+            if (ctx.block().size() == 1) {
+                sb.append("\t}\n");
+            } else {
+                sb.append("\t} else {\n");
+                sb.append(ctx.block().get(1).getText());
+                sb.append("}\n");
+            }
         }
 
-        /*
-         * Helper methods
-         */
-        private void drainContentNodes(final RythmParser.ElementsContext ctx) {
-            final Token start = ctx.getStart();
-            final StringBuilder tsb = new StringBuilder();
-            int inc = 0;
-            int end = start.getTokenIndex();
-            int linestart = -1;
-            for (int i = contentStart; i <= end; i++, inc++) {
-                Token t = tokenStream.get(i);
-                if (t.getTokenIndex() == start.getTokenIndex())
-                    continue;
-                if (t.getChannel() != RythmLexer.TemplateData)
-                    continue;
-                if (t.getType() != RythmLexer.CONTENT)
-                    break;
-                if (linestart == -1)
-                    linestart = t.getLine();
-                tsb.append(t.getText().replace("\r", "\\r").replace("\n", "\\n"));
-            }
-            if (tsb.length() > 0) {
-                final String functionName = String.format("drain_%s", linestart);
-                drainFunctions.put(functionName, tsb.toString());
-                sb.append(functionName).append("();\n");
-            }
+        @Override
+        public void enterOutputExpression(RythmParser.OutputExpressionContext ctx) {
+            //drainContentNodes(ctx);
         }
 
         /*

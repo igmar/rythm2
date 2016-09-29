@@ -1,1 +1,1 @@
-(template (elements (args @ args (templateArgument (qualifiedName FooBar) myfoobar) \n)) (elements (flow_if @ if (boolExpression ( (expression (primary (literal (booleanLiteral true)))) )) (block { }))))
+(template (elements (args @ args (templateArgument (qualifiedName FooBar) myfoobar) \n)) (elements (templatedata (templatedataelement \n))) (elements (flow_if @ if (boolExpression ( (expression (primary (literal (booleanLiteral true)))) )) (block { (elements (templatedata (templatedataelement  ))) }))) (elements (templatedata (templatedataelement \n))))

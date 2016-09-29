@@ -11,6 +11,7 @@ package org.rythmengine.internal.parser;
 import org.rythmengine.internal.debug.AntlrDebug;
 import java.util.List;
 import java.util.ArrayList;
+import org.apache.commons.lang3.StringUtils;
 }
 
 @lexer::members {
@@ -34,22 +35,43 @@ import java.util.ArrayList;
         if (tokens.size() == 0) {
             return false;
         }
+        for (int i = tokens.size() - 1; i >= 0; i--) {
+            Token t = tokens.get(i);
+            if (t.getType() == RythmLexer.CONTENT) {
+                if (!StringUtils.isWhitespace(t.getText())) {
+                    return false;
+                }
+                continue;
+            }
+            if (t.getType() == RythmLexer.CURLY_CLOSE) {
+                return true;
+            } else {
+                break;
+            }
+        }
+        return false;
+    }
+
+    private boolean previous_is_else() {
+        if (tokens.size() == 0) {
+            return false;
+        }
+
         Token t = tokens.get(tokens.size() - 1);
-        if (t.getType() == RythmLexer.CURLY_CLOSE) {
+        if (t.getType() == RythmLexer.ELSE) {
             return true;
         }
         return false;
     }
 }
 
-channels { TemplateComment, TemplateData, JavaCode }
+channels { TemplateComment, JavaCode }
 
+DOUBLE_AT:                  '@@'                        ;
 AT:                         '@'                         -> mode(OPERATOR);
-DOUBLE_AT:                  '@@'                        -> channel(TemplateData);
 CURLY_CLOSE:                '}'                         { block_nesting > 0 && block_nesting >= curly_nesting }? { curly_nesting--; block_nesting--; };
 NORMAL_ELSE:                'else'                      { previous_is_parenthesis_close() }? { block_nesting++; tokens.clear(); setType(ELSE); } -> mode(RYTHM);
-NWS:                        [\t\r\n ]+                  { setType(WS); } -> channel(HIDDEN);
-CONTENT:                    .                           -> channel(TemplateData);
+CONTENT:                    .                           ;
 
 mode OPERATOR;
 COE_START:                  '('                         { coe_started = true; } -> mode(RYTHM);

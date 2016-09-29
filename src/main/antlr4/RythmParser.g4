@@ -25,7 +25,7 @@ template
     ;
 
 elements
-    : doubleat
+    : templatedata
     | comment
     | javaBlock
     | args
@@ -37,8 +37,14 @@ elements
     | include
     ;
 
-doubleat
+templatedata
+    : templatedataelement+
+    ;
+
+templatedataelement
     : DOUBLE_AT
+    | WS
+    | CONTENT
     ;
 
 flow_if

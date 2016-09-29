@@ -1,1 +1,1 @@
-(template (elements (flow_return @ return)))
+(template (elements (templatedata (templatedataelement \nSome text\n))) (elements (flow_return @ return)) (elements (templatedata (templatedataelement \n))))

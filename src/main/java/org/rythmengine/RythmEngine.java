@@ -114,7 +114,7 @@ public final class RythmEngine implements AutoCloseable {
         }
     }
 
-    private CompiledTemplate compileTemplate(String identifier, InputStream is) throws InterruptedException, java.util.concurrent.ExecutionException, java.util.concurrent.TimeoutException {
+    private CompiledTemplate compileTemplate(String identifier, InputStream is) throws InterruptedException, java.util.concurrent.ExecutionException, java.util.concurrent.TimeoutException, IOException {
         IResourceLoader resourceLoader = this.configuration.getResourceLoaderProvider().get();
         Future<ParsedTemplate> parseFuture = parsePool.submit(new TemplateParser(identifier, sourceGenerator, resourceLoader, is));
         ParsedTemplate pt = parseFuture.get(5, TimeUnit.SECONDS);
