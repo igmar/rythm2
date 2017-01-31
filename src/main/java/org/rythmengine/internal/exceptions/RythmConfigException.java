@@ -1,18 +1,18 @@
 package org.rythmengine.internal.exceptions;
 
-/**
- * Created by igmar on 22/07/16.
+/*
+ * Thrown when a RythmEngine can't be create due to an error in the supplied config
  */
-public class RythmConfigException extends RuntimeException {
+public final class RythmConfigException extends RuntimeException {
     public RythmConfigException() {
         super();
     }
 
-    public RythmConfigException(String message) {
+    public RythmConfigException(final String message) {
         super(message);
     }
 
-    public RythmConfigException(Throwable cause) {
+    public RythmConfigException(final Throwable cause) {
         super(cause);
     }
 }

@@ -9,7 +9,7 @@ public abstract class TemplateCompiler implements Callable<CompiledTemplate> {
     protected ParsedTemplate parsedTemplate;
     protected CompiledTemplate compiledTemplate;
 
-    public TemplateCompiler(ParsedTemplate parsed) throws RythmCompileException {
+    public TemplateCompiler(final ParsedTemplate parsed) throws RythmCompileException {
         this.parsedTemplate = parsed;
     }
 }

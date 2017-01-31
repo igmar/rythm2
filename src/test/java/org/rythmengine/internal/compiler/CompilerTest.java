@@ -6,9 +6,6 @@ import org.rythmengine.TestBase;
 import org.rythmengine.conf.RythmConfiguration;
 import org.rythmengine.conf.RythmEngineMode;
 
-/**
- * Created by igmar on 22/07/16.
- */
 public class CompilerTest extends TestBase {
     @Test
     public void simpleCompile() {

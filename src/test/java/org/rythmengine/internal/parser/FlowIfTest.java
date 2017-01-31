@@ -20,8 +20,9 @@ public class FlowIfTest extends TestBase {
         String expected = loadFile("flow_if/flow_if1.html.exp");
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
+        String actual = pt.toStringTree(parser);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(expected, pt.toStringTree(parser));
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -30,8 +31,9 @@ public class FlowIfTest extends TestBase {
         String expected = loadFile("flow_if/flow_if2.html.exp");
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
+        String actual = pt.toStringTree(parser);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(expected, pt.toStringTree(parser));
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -40,8 +42,9 @@ public class FlowIfTest extends TestBase {
         String expected = loadFile("flow_if/flow_if3.html.exp");
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
+        String actual = pt.toStringTree(parser);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(expected, pt.toStringTree(parser));
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -50,8 +53,9 @@ public class FlowIfTest extends TestBase {
         String expected = loadFile("flow_if/flow_if4.html.exp");
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
+        String actual = pt.toStringTree(parser);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(expected, pt.toStringTree(parser));
+        assertEquals(expected, actual);
     }
 
     @Test

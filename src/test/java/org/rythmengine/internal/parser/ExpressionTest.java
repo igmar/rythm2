@@ -19,8 +19,9 @@ public class ExpressionTest extends TestBase {
         String expected = loadFile("expression/expression1.html.exp");
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
+        String actual = pt.toStringTree(parser);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(expected, pt.toStringTree(parser));
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -29,8 +30,9 @@ public class ExpressionTest extends TestBase {
         String expected = loadFile("expression/expression2.html.exp");
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
+        String actual = pt.toStringTree(parser);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(expected, pt.toStringTree(parser));
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -39,8 +41,9 @@ public class ExpressionTest extends TestBase {
         String expected = loadFile("expression/expression3.html.exp");
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
+        String actual = pt.toStringTree(parser);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(expected, pt.toStringTree(parser));
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -49,8 +52,9 @@ public class ExpressionTest extends TestBase {
         String expected = loadFile("expression/expression4.html.exp");
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
+        String actual = pt.toStringTree(parser);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(expected, pt.toStringTree(parser));
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -59,8 +63,9 @@ public class ExpressionTest extends TestBase {
         String expected = loadFile("expression/expression5.html.exp");
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
+        String actual = pt.toStringTree(parser);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(expected, pt.toStringTree(parser));
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -69,7 +74,8 @@ public class ExpressionTest extends TestBase {
         String expected = loadFile("expression/expression6.html.exp");
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
+        String actual = pt.toStringTree(parser);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(expected, pt.toStringTree(parser));
+        assertEquals(expected, actual);
     }
 }

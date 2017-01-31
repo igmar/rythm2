@@ -8,6 +8,8 @@ parser grammar RythmParser;
 @header {
 package org.rythmengine.internal.parser;
 import org.rythmengine.internal.IResourceLoader;
+import org.rythmengine.internal.parser.RythmParser;
+import org.rythmengine.internal.parser.RythmParserListener;
 }
 
 options { tokenVocab=RythmLexer; }
@@ -48,7 +50,11 @@ templatedataelement
     ;
 
 flow_if
-    : AT IF_BLOCK_START boolExpression block (ELSE block)?
+    : AT IF_BLOCK_START boolExpression block (flow_if_else block)?
+    ;
+
+flow_if_else
+    : ELSE
     ;
 
 flow_for

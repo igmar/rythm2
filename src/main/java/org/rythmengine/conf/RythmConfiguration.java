@@ -23,6 +23,7 @@ public final class RythmConfiguration {
     private File tempdir;
     private Provider<IResourceLoader> resourceLoaderProvider;
     private Provider<ISourceGenerator> sourceGeneratorProvider;
+    private RythmCompiler compiler;
 
     private RythmConfiguration(Builder builder) {
         this.id = builder.id;
@@ -33,6 +34,7 @@ public final class RythmConfiguration {
         this.tempdir = builder.tempdir;
         this.resourceLoaderProvider = builder.resourceLoaderProvider;
         this.sourceGeneratorProvider = builder.sourceGeneratorProvider;
+        this.compiler = builder.compiler;
     }
 
     public String getId() {
@@ -67,6 +69,10 @@ public final class RythmConfiguration {
         return sourceGeneratorProvider;
     }
 
+    public RythmCompiler getCompiler() {
+        return compiler;
+    }
+
     public static class Builder {
         private String id;
         private ClassLoader classLoader;
@@ -78,6 +84,7 @@ public final class RythmConfiguration {
         private Provider<IResourceLoader> resourceLoaderProvider;
         private Provider<ISourceGenerator> sourceGeneratorProvider;
         private Logger logger;
+        private RythmCompiler compiler;
 
         public Builder() {
             // FIXME : Add random prefix
@@ -91,6 +98,7 @@ public final class RythmConfiguration {
             this.tempdir = new File(System.getProperty("java.io.tmpdir"), "__rythm");
             this.resourceLoaderProvider = new DefaultResourceLoaderProvider();
             this.sourceGeneratorProvider = new DefaultSourceGeneratorProvider();
+            this.compiler = RythmCompiler.JDT;
             Logger.register(JDKLogger.class);
         }
 
@@ -165,6 +173,14 @@ public final class RythmConfiguration {
                 throw new RythmConfigException("sourcegenerator provider is null");
             }
             this.sourceGeneratorProvider = provider;
+            return this;
+        }
+
+        public Builder withCompiler(RythmCompiler compiler) {
+            if (compiler == null) {
+                throw new RythmConfigException("compiler is null");
+            }
+            this.compiler = compiler;
             return this;
         }
 

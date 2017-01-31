@@ -1,18 +1,15 @@
 package org.rythmengine.internal.exceptions;
 
-/**
- * Created by igmar on 22/07/16.
- */
-public class RythmParserException extends RuntimeException {
+public final class RythmParserException extends RuntimeException {
     public RythmParserException() {
         super();
     }
 
-    public RythmParserException(String message) {
+    public RythmParserException(final String message) {
         super(message);
     }
 
-    public RythmParserException(Throwable cause) {
+    public RythmParserException(final Throwable cause) {
         super(cause);
     }
 }

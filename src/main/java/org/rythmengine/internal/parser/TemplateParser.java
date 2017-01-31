@@ -64,6 +64,7 @@ public final class TemplateParser implements Callable<ParsedTemplate> {
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
         tokenStream.fill();
         List<Token> tokens = tokenStream.getTokens();
+        tokens = handleElseWS(tokens);
         tokens = mergeContentTokens(tokens);
         tokens = rewriteElseCondition(tokens);
         try {
@@ -81,7 +82,42 @@ public final class TemplateParser implements Callable<ParsedTemplate> {
         return parser;
     }
 
-    private List<Token> mergeContentTokens(List<Token> input) {
+    private List<Token> handleElseWS(final List<Token> input) {
+        /*
+         * We consider the EOL behind the { to be part of the condition, not whatever follows it
+         * So, if we encounter a CURLY_OPEN, the token behind it is a newline
+         */
+        boolean curly_open = false;
+        final List<Token> tokens = new ArrayList<>(input.size());
+        for (int i = 0; i < input.size(); i++) {
+            final Token current = input.get(i);
+            if (current.getType() == RythmLexer.CURLY_OPEN) {
+                tokens.add(current);
+                curly_open = true;
+                continue;
+            }
+            if (curly_open) {
+                if (current.getType() == RythmLexer.CONTENT) {
+                    if (current.getText().equals("\r") ||
+                        current.getText().equals("\n") ||
+                        current.getText().equals("\r\n")) {
+                        CommonToken t = new CommonToken(current);
+                        t.setType(RythmLexer.WS);
+                        t.setChannel(RythmLexer.HIDDEN);
+                        tokens.add(t);
+                    } else {
+                        tokens.add(current);
+                    }
+                }
+                curly_open = false;
+            } else {
+                tokens.add(current);
+            }
+        }
+        return tokens;
+    }
+
+    private List<Token> mergeContentTokens(final List<Token> input) {
         /*
            This gem is needed because ANTLR doesn't support stop tokens in non-greedy expressions. Which
            is bad.
@@ -89,7 +125,7 @@ public final class TemplateParser implements Callable<ParsedTemplate> {
            The TokenRewriteStream stuff doesn't work as I expect. Directly modify the source stream using
            reflection
          */
-        final List<Token> tokens = new ArrayList<>(100);
+        final List<Token> tokens = new ArrayList<>(input.size());
 
         int token_start = -1;
         for (int i = 0; i < input.size(); i++) {
@@ -97,13 +133,18 @@ public final class TemplateParser implements Callable<ParsedTemplate> {
             if (current.getType() != RythmLexer.CONTENT) {
                 if (token_start != -1) {
                     final StringBuilder text = new StringBuilder();
+                    Token fct = current;
                     for (int j = token_start; j < current.getTokenIndex(); j++) {
                         final Token t = input.get(j);
+                        if (j == token_start) {
+                            fct = t;
+                        }
                         text.append(t.getText());
                     }
                     CommonToken t = new CommonToken(current);
                     t.setType(RythmLexer.CONTENT);
                     t.setText(text.toString());
+                    t.setLine(fct.getLine());
                     tokens.add(t);
                     t = new CommonToken(current);
                     tokens.add(t);
@@ -121,8 +162,8 @@ public final class TemplateParser implements Callable<ParsedTemplate> {
         return tokens;
     }
 
-    private List<Token> rewriteElseCondition(List<Token> input) {
-        final List<Token> tokens = new ArrayList<>(100);
+    private List<Token> rewriteElseCondition(final List<Token> input) {
+        final List<Token> tokens = new ArrayList<>(input.size());
 
         for (int i = 0; i < input.size(); i++) {
             final Token current = input.get(i);
@@ -158,7 +199,7 @@ public final class TemplateParser implements Callable<ParsedTemplate> {
         return tokens;
     }
 
-    private String inputStreamToString(InputStream is) throws IOException {
+    private String inputStreamToString(final InputStream is) throws IOException {
         return IOUtils.toString(is, StandardCharsets.UTF_8);
     }
 

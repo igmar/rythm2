@@ -19,8 +19,9 @@ public class FlowInvokeTest extends TestBase {
         String expected = loadFile("invoke/invoke1.html.exp");
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
+        String actual = pt.toStringTree(parser);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(expected, pt.toStringTree(parser));
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -29,7 +30,8 @@ public class FlowInvokeTest extends TestBase {
         String expected = loadFile("invoke/invoke2.html.exp");
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
+        String actual = pt.toStringTree(parser);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(expected, pt.toStringTree(parser));
+        assertEquals(expected, actual);
     }
 }

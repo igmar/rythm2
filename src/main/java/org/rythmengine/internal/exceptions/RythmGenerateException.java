@@ -1,15 +1,18 @@
 package org.rythmengine.internal.exceptions;
 
-public class RythmGenerateException extends Exception {
+/*
+ * Thrown when we encounter an error in the generation phase
+ */
+public final class RythmGenerateException extends Exception {
     public RythmGenerateException() {
         super();
     }
 
-    public RythmGenerateException(String message) {
+    public RythmGenerateException(final String message) {
         super(message);
     }
 
-    public RythmGenerateException(Throwable cause) {
+    public RythmGenerateException(final Throwable cause) {
         super(cause);
     }
 }

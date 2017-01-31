@@ -1,1 +1,1 @@
-(template (elements (macro @ macro ( " (canonicalName foo) " ) (block { (elements (templatedata (templatedataelement \n    Some nice text\n))) }))) (elements (templatedata (templatedataelement \n))))
+(template (elements (macro @ macro ( " (canonicalName foo) " ) (block { (elements (templatedata (templatedataelement     Some nice text\n))) }))) (elements (templatedata (templatedataelement \n))))

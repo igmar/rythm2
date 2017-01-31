@@ -21,6 +21,5 @@ public class GeneratorJava7Test extends TestBase {
         String expected = loadFile("generator/generator1.java");
 
         CompiledTemplate result = engine.compile("generator/generator1.html", is);
-
     }
 }

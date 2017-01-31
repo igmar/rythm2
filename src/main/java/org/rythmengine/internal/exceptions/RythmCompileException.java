@@ -1,22 +1,22 @@
 package org.rythmengine.internal.exceptions;
 
-/**
- * Created by igmar on 12/07/16.
+/*
+ * Thrown when a template compile error occurs
  */
-public class RythmCompileException extends RuntimeException {
+public final class RythmCompileException extends RuntimeException {
     public RythmCompileException() {
         super();
     }
 
-    public RythmCompileException(String message) {
+    public RythmCompileException(final String message) {
         super(message);
     }
 
-    public RythmCompileException(Throwable cause) {
+    public RythmCompileException(final Throwable cause) {
         super(cause);
     }
 
-    public RythmCompileException(String message, Throwable cause) {
+    public RythmCompileException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

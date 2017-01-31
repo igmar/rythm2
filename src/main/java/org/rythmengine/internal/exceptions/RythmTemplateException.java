@@ -1,18 +1,16 @@
 package org.rythmengine.internal.exceptions;
 
-/**
- * Created by igmar on 22/07/16.
- */
-public class RythmTemplateException extends RuntimeException {
+
+public final class RythmTemplateException extends RuntimeException {
     public RythmTemplateException() {
         super();
     }
 
-    public RythmTemplateException(String message) {
+    public RythmTemplateException(final String message) {
         super(message);
     }
 
-    public RythmTemplateException(Throwable cause) {
+    public RythmTemplateException(final Throwable cause) {
         super(cause);
     }
 }

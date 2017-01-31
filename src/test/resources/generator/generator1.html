@@ -1,10 +1,17 @@
 @args String myfoobar, Integer myinteger
+@args String gecko
 
 Dit is een test
 
-@if(true) {
-FooBar
+@if(foo) {
+    BarFoo
+    @if(bar) {
+        FooBar
+    } else {
+        Foo
+    }
 } else {
-Pokemon
-} else {
+    Bar
 }
+
+Geckos rule

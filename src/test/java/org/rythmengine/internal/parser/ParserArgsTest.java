@@ -19,8 +19,9 @@ public class ParserArgsTest extends TestBase {
         String expected = loadFile("args/args1.html.exp");
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
+        String actual = pt.toStringTree(parser);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(expected, pt.toStringTree(parser));
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -29,8 +30,9 @@ public class ParserArgsTest extends TestBase {
         String expected = loadFile("args/args2.html.exp");
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
+        String actual = pt.toStringTree(parser);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(expected, pt.toStringTree(parser));
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -39,8 +41,9 @@ public class ParserArgsTest extends TestBase {
         String expected = loadFile("args/args3.html.exp");
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
+        String actual = pt.toStringTree(parser);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(expected, pt.toStringTree(parser));
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -49,7 +52,8 @@ public class ParserArgsTest extends TestBase {
         String expected = loadFile("args/args4.html.exp");
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
+        String actual = pt.toStringTree(parser);
         assertEquals(0, parser.getNumberOfSyntaxErrors());
-        assertEquals(expected, pt.toStringTree(parser));
+        assertEquals(expected, actual);
     }
 }
