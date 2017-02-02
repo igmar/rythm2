@@ -21,6 +21,7 @@ public final class RythmConfiguration {
     private RythmEngineMode engineMode;
     private File homedir;
     private File tempdir;
+    private File templatedir;
     private Provider<IResourceLoader> resourceLoaderProvider;
     private Provider<ISourceGenerator> sourceGeneratorProvider;
     private RythmCompiler compiler;
@@ -32,6 +33,7 @@ public final class RythmConfiguration {
         this.engineMode = builder.engineMode;
         this.homedir = builder.homedir;
         this.tempdir = builder.tempdir;
+        this.templatedir = builder.templatedir;
         this.resourceLoaderProvider = builder.resourceLoaderProvider;
         this.sourceGeneratorProvider = builder.sourceGeneratorProvider;
         this.compiler = builder.compiler;
@@ -61,6 +63,10 @@ public final class RythmConfiguration {
         return tempdir;
     }
 
+    public File getTemplatedir() {
+        return templatedir;
+    }
+
     public Provider<IResourceLoader> getResourceLoaderProvider() {
         return resourceLoaderProvider;
     }
@@ -80,6 +86,7 @@ public final class RythmConfiguration {
         private RythmEngineMode engineMode;
         private File homedir;
         private File tempdir;
+        private File templatedir;
 
         private Provider<IResourceLoader> resourceLoaderProvider;
         private Provider<ISourceGenerator> sourceGeneratorProvider;
@@ -96,6 +103,7 @@ public final class RythmConfiguration {
             //this.homedir = new File(Thread.currentThread().getContextClassLoader().getResource("rythm").getFile());
             this.homedir = new File("/tmp");
             this.tempdir = new File(System.getProperty("java.io.tmpdir"), "__rythm");
+            this.templatedir = new File( "__rythm_compiled");
             this.resourceLoaderProvider = new DefaultResourceLoaderProvider();
             this.sourceGeneratorProvider = new DefaultSourceGeneratorProvider();
             this.compiler = RythmCompiler.JDT;

@@ -11,7 +11,6 @@ import org.rythmengine.internal.compiler.jdk7.JDK7TemplateCompiler;
 import org.rythmengine.internal.exceptions.RythmCompileException;
 import org.rythmengine.internal.generator.ISourceGenerator;
 import org.rythmengine.internal.hash.fnv.FNV;
-import org.rythmengine.internal.logger.Logger;
 import org.rythmengine.internal.parser.ParsedTemplate;
 import org.rythmengine.internal.parser.TemplateParser;
 
@@ -22,6 +21,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
@@ -114,13 +115,13 @@ public final class RythmEngine implements AutoCloseable {
         }
     }
 
-    private CompiledTemplate compileTemplate(String identifier, InputStream is) throws InterruptedException, java.util.concurrent.ExecutionException, java.util.concurrent.TimeoutException, IOException {
-        IResourceLoader resourceLoader = this.configuration.getResourceLoaderProvider().get();
-        Future<ParsedTemplate> parseFuture = parsePool.submit(new TemplateParser(identifier, sourceGenerator, resourceLoader, is));
-        ParsedTemplate pt = parseFuture.get(5, TimeUnit.SECONDS);
-        Future<CompiledTemplate> compileFuture = compilePool.submit(new JDK7TemplateCompiler(pt));
-        CompiledTemplate ct = compileFuture.get(5, TimeUnit.SECONDS);
-        return ct;
+    private CompiledTemplate compileTemplate(final String identifier, final InputStream is) throws InterruptedException, java.util.concurrent.ExecutionException, java.util.concurrent.TimeoutException, IOException {
+        final IResourceLoader resourceLoader = this.configuration.getResourceLoaderProvider().get();
+        final Future<ParsedTemplate> parseFuture = parsePool.submit(new TemplateParser(identifier, sourceGenerator, resourceLoader, is));
+        final ParsedTemplate pt = parseFuture.get(5, TimeUnit.SECONDS);
+        final Future<Map<ParsedTemplate, CompiledTemplate>> compileFuture = compilePool.submit(new JDK7TemplateCompiler(configuration, Collections.singletonList(pt)));
+        final Map<ParsedTemplate, CompiledTemplate> ct = compileFuture.get(5, TimeUnit.SECONDS);
+        return ct == null ? null : ct.get(pt);
     }
 
     private String getHash(InputStream is) throws IOException {

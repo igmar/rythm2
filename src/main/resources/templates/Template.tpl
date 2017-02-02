@@ -1,7 +1,11 @@
 package rythmengine.compiled;
 
+import java.util.Map;
+import java.lang.StringBuffer;
+import org.rythmengine.internal.*;
 import org.rythmengine.exceptions.RythmTemplateRuntimeException;
 import org.rythmengine.template.TemplateBase;
+
 
 @@IMPORTS@@
 
@@ -17,7 +21,7 @@ public final class @@CLASSNAME@@ extends TemplateBase {
     }
 
     @Override
-    public String execute(IHttpContext context) {
+    public String execute(final IHttpContext context) {
 @@FLOW@@
     }
 
@@ -27,3 +31,6 @@ public final class @@CLASSNAME@@ extends TemplateBase {
 
 @@FUNCTIONS@@
 }
+/*
+@@METADATA@@
+*/

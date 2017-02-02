@@ -8,20 +8,29 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.rythmengine.internal.ILogger;
 import org.rythmengine.internal.exceptions.RythmGenerateException;
 import org.rythmengine.internal.exceptions.RythmParserException;
 import org.rythmengine.internal.fifo.FIFO;
 import org.rythmengine.internal.fifo.LinkedFIFO;
 import org.rythmengine.internal.generator.ISourceGenerator;
+import org.rythmengine.internal.generator.GeneratedTemplateSource;
+import org.rythmengine.internal.hash.sha1.SHA1;
 import org.rythmengine.internal.logger.Logger;
 import org.rythmengine.internal.parser.RythmParser;
 import org.rythmengine.internal.parser.RythmParserBaseListener;
 
+import javax.inject.Singleton;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
+@Singleton
 public class Java7SourceGenerator implements ISourceGenerator {
     private static ILogger logger = Logger.get(Java7SourceGenerator.class);
 
@@ -29,14 +38,15 @@ public class Java7SourceGenerator implements ISourceGenerator {
     }
 
     @Override
-    public String generateSource(final String identifier, final ParseTree pt, final TokenStream tokenStream) throws RythmGenerateException {
+    public GeneratedTemplateSource generateSource(final String source, final String identifier, final ParseTree pt, final TokenStream tokenStream) throws RythmGenerateException {
         if (identifier == null || pt == null || tokenStream == null) {
             throw new RythmParserException("Internal error : Bad arguments");
         }
+        
         logger.info("generateSource()");
 
-        ParseTreeWalker walker = new ParseTreeWalker();
-        Java7Listener listener = new Java7Listener(identifier, tokenStream);
+        final ParseTreeWalker walker = new ParseTreeWalker();
+        final Java7Listener listener = new Java7Listener(identifier, tokenStream);
         walker.walk(listener, pt);
 
         final String template = loadTemplate().
@@ -45,15 +55,14 @@ public class Java7SourceGenerator implements ISourceGenerator {
                 replace("@@VARS@@", listener.getGeneratedVars()).
                 replace("@@CONSTRUCTOR@@", listener.getGeneratedConstructor()).
                 replace("@@FUNCTIONS@@", listener.getGeneratedFunctions()).
-                replace("@@FLOW@@", listener.getGeneratedFlow());
+                replace("@@FLOW@@", listener.getGeneratedFlow()).
+                replace("@@METADATA@@", generateMetaData(source, identifier, listener.getLines(), listener.getMatrix()));
 
-        System.out.println(template);
-
-        return null;
+        return new GeneratedTemplateSource(listener.getGeneratedClassName(), template);
     }
 
     private String loadTemplate() throws RythmGenerateException {
-        InputStream tpl = this.getClass().getClassLoader().getResourceAsStream("templates/Template.tpl");
+        final InputStream tpl = this.getClass().getClassLoader().getResourceAsStream("templates/Template.tpl");
         if (tpl == null) {
             throw new RythmGenerateException("Can't find generator template");
         }
@@ -65,7 +74,30 @@ public class Java7SourceGenerator implements ISourceGenerator {
         }
     }
 
+    private String generateMetaData(final String source, final String path, Map<String, String> lines, Map<String, String> matrix) {
+        final String hash = SHA1.sha1Hex(source);
+
+        return String.format(
+                "    -- GENERATED --\n" +
+                "    PATH   : %s\n" +
+                "    SHA1   : %s\n" +
+                "    LINES  : %s\n" +
+                "    MATRIX : %s\n" +
+                "    ---------------\n",
+                path, hash, flattenMap(lines), flattenMap(matrix));
+    }
+
+    private String flattenMap(final Map<String, String> lines) {
+        final List<String> t = new ArrayList<>();
+        for (Map.Entry<String, String> e : lines.entrySet()) {
+            t.add(String.format("%s->%s", e.getKey(), e.getValue()));
+        }
+        return StringUtils.join(t, "|");
+    }
+
     private class Java7Listener extends RythmParserBaseListener {
+        // Debug
+        private final Boolean debug = false;
         // Provided
         private final String identifier;
         private final TokenStream tokenStream;
@@ -78,8 +110,7 @@ public class Java7SourceGenerator implements ISourceGenerator {
         private final StringBuffer functions;
         private final StringBuffer vars;
         private final FIFO<String> stack;
-
-
+        
         public Java7Listener(final String identifier, final TokenStream tokenStream) {
 
             this.identifier = identifier;
@@ -119,39 +150,39 @@ public class Java7SourceGenerator implements ISourceGenerator {
 
         @Override
         public void enterBlock(RythmParser.BlockContext ctx) {
-            System.out.println("enterBlock()");
+            logger.debug("enterBlock()");
             super.enterBlock(ctx);
             this.flow.append("{\n");
         }
 
         @Override
         public void exitBlock(RythmParser.BlockContext ctx) {
-            System.out.println("exitBlock()");
+            logger.debug("exitBlock()");
             super.exitBlock(ctx);
-            this.flow.append("\t\t}");
+            this.flow.append("\t\t}\n");
         }
 
         @Override
         public void enterForExpression(RythmParser.ForExpressionContext ctx) {
-            System.out.println("enterForExpression()");
+            logger.debug("enterForExpression()");
             super.enterForExpression(ctx);
         }
 
         @Override
         public void exitForExpression(RythmParser.ForExpressionContext ctx) {
-            System.out.println("exitForExpression()");
+            logger.debug("exitForExpression()");
             super.exitForExpression(ctx);
         }
 
         @Override
         public void enterArgs(RythmParser.ArgsContext ctx) {
-            System.out.println("enterArgs()");
+            logger.debug("enterArgs()");
             super.enterArgs(ctx);
         }
 
         @Override
         public void exitArgs(RythmParser.ArgsContext ctx) {
-            System.out.println("exitArgs()");
+            logger.debug("exitArgs()");
             super.exitArgs(ctx);
 
             /*
@@ -177,116 +208,116 @@ public class Java7SourceGenerator implements ISourceGenerator {
                     this.imports.append(String.format("import %s;\n", fqn));
                 }
                 this.vars.append(String.format("\tprivate %s %s;\n", fqn, name));
-                this.constructor.append(String.format("\t\tthis.%s = args.get(%s);\n", name, name));
+                this.constructor.append(String.format("\t\tthis.%s = args.get(\"%s\");\n", name, name));
             }
         }
 
         @Override
         public void enterTemplateArgument(RythmParser.TemplateArgumentContext ctx) {
-            System.out.println("enterTemplateArgument()");
+            logger.debug("enterTemplateArgument()");
             super.enterTemplateArgument(ctx);
         }
 
         @Override
         public void exitTemplateArgument(RythmParser.TemplateArgumentContext ctx) {
-            System.out.println("exitTemplateArgument()");
+            logger.debug("exitTemplateArgument()");
             super.exitTemplateArgument(ctx);
         }
 
         @Override
         public void enterVariableDeclarator(RythmParser.VariableDeclaratorContext ctx) {
-            System.out.println("enterVariableDeclarator()");
+            logger.debug("enterVariableDeclarator()");
             super.enterVariableDeclarator(ctx);
         }
 
         @Override
         public void exitVariableDeclarator(RythmParser.VariableDeclaratorContext ctx) {
-            System.out.println("exitVariableDeclarator()");
+            logger.debug("exitVariableDeclarator()");
             super.exitVariableDeclarator(ctx);
         }
 
         @Override
         public void enterIntegralType(RythmParser.IntegralTypeContext ctx) {
-            System.out.println("enterIntegralType()");
+            logger.debug("enterIntegralType()");
             super.enterIntegralType(ctx);
         }
 
         @Override
         public void exitIntegralType(RythmParser.IntegralTypeContext ctx) {
-            System.out.println("exitIntegralType()");
+            logger.debug("exitIntegralType()");
             super.exitIntegralType(ctx);
         }
 
         @Override
         public void enterBoolExpression(RythmParser.BoolExpressionContext ctx) {
-            System.out.println("enterBoolExpression()");
+            logger.debug("enterBoolExpression()");
             super.enterBoolExpression(ctx);
             this.flow.append(ctx.getText());
         }
 
         @Override
         public void exitBoolExpression(RythmParser.BoolExpressionContext ctx) {
-            System.out.println("exitBoolExpression()");
+            logger.debug("exitBoolExpression()");
             super.exitBoolExpression(ctx);
         }
 
         @Override
         public void enterExpression(RythmParser.ExpressionContext ctx) {
-            System.out.println("enterExpression()");
+            logger.debug("enterExpression()");
             super.enterExpression(ctx);
         }
 
         @Override
         public void exitExpression(RythmParser.ExpressionContext ctx) {
-            System.out.println("exitExpression()");
+            logger.debug("exitExpression()");
             super.exitExpression(ctx);
         }
 
         @Override
         public void enterIncDecOperator(RythmParser.IncDecOperatorContext ctx) {
-            System.out.println("enterIncDecOperator()");
+            logger.debug("enterIncDecOperator()");
             super.enterIncDecOperator(ctx);
         }
 
         @Override
         public void exitIncDecOperator(RythmParser.IncDecOperatorContext ctx) {
-            System.out.println("exitIncDecOperator()");
+            logger.debug("exitIncDecOperator()");
             super.exitIncDecOperator(ctx);
         }
 
         @Override
         public void enterPrefixOperator(RythmParser.PrefixOperatorContext ctx) {
-            System.out.println("enterPrefixOperator()");
+            logger.debug("enterPrefixOperator()");
             super.enterPrefixOperator(ctx);
         }
 
         @Override
         public void exitPrefixOperator(RythmParser.PrefixOperatorContext ctx) {
-            System.out.println("exitPrefixOperator()");
+            logger.debug("exitPrefixOperator()");
             super.exitPrefixOperator(ctx);
         }
 
         @Override
         public void enterPrimary(RythmParser.PrimaryContext ctx) {
-            System.out.println("enterPrimary()");
+            logger.debug("enterPrimary()");
             super.enterPrimary(ctx);
         }
 
         @Override
         public void exitPrimary(RythmParser.PrimaryContext ctx) {
-            System.out.println("exitPrimary()");
+            logger.debug("exitPrimary()");
             super.exitPrimary(ctx);
         }
 
         @Override
         public void enterLiteral(RythmParser.LiteralContext ctx) {
-            System.out.println("enterLiteral()");
+            logger.debug("enterLiteral()");
             super.enterLiteral(ctx);
         }
 
         @Override
         public void exitLiteral(RythmParser.LiteralContext ctx) {
-            System.out.println("exitLiteral()");
+            logger.debug("exitLiteral()");
             super.exitLiteral(ctx);
         }
 
@@ -412,25 +443,25 @@ public class Java7SourceGenerator implements ISourceGenerator {
 
         @Override
         public void enterComment(RythmParser.CommentContext ctx) {
-            System.out.println("enterComment()");
+            logger.debug("enterComment()");
             super.enterComment(ctx);
         }
 
         @Override
         public void exitComment(RythmParser.CommentContext ctx) {
-            System.out.println("exitComment()");
+            logger.debug("exitComment()");
             super.exitComment(ctx);
         }
 
         @Override
         public void enterJavaBlock(RythmParser.JavaBlockContext ctx) {
-            System.out.println("enterJavaBlock()");
+            logger.debug("enterJavaBlock()");
             super.enterJavaBlock(ctx);
         }
 
         @Override
         public void exitJavaBlock(RythmParser.JavaBlockContext ctx) {
-            System.out.println("exitJavaBlock()");
+            logger.debug("exitJavaBlock()");
             super.exitJavaBlock(ctx);
         }
 
@@ -456,7 +487,7 @@ public class Java7SourceGenerator implements ISourceGenerator {
 
         @Override
         public void enterTemplate(RythmParser.TemplateContext ctx) {
-            System.out.println("enterTemplate()");
+            logger.debug("enterTemplate()");
             super.enterTemplate(ctx);
 
             this.className = String.format("ct_%s", this.identifier.replace("/", "_").replace(".", "_"));
@@ -464,7 +495,7 @@ public class Java7SourceGenerator implements ISourceGenerator {
 
         @Override
         public void exitTemplate(RythmParser.TemplateContext ctx) {
-            System.out.println("exitTemplate()");
+            logger.debug("exitTemplate()");
             super.exitTemplate(ctx);
 
             // TODO : Write post-parse actions
@@ -473,13 +504,13 @@ public class Java7SourceGenerator implements ISourceGenerator {
 
         @Override
         public void enterElements(RythmParser.ElementsContext ctx) {
-            System.out.println("enterElements()");
+            logger.debug("enterElements()");
             super.enterElements(ctx);
         }
 
         @Override
         public void exitElements(RythmParser.ElementsContext ctx) {
-            System.out.println("exitElements()");
+            logger.debug("exitElements()");
             super.exitElements(ctx);
 
             // Flush the fifo.
@@ -492,13 +523,13 @@ public class Java7SourceGenerator implements ISourceGenerator {
 
         @Override
         public void enterTemplatedata(RythmParser.TemplatedataContext ctx) {
-            System.out.println("enterTemplatedata()");
+            logger.debug("enterTemplatedata()");
             super.enterTemplatedata(ctx);
         }
 
         @Override
         public void exitTemplatedata(RythmParser.TemplatedataContext ctx) {
-            System.out.println("exitTemplatedata()");
+            logger.debug("exitTemplatedata()");
             super.exitTemplatedata(ctx);
 
             // Create a proper function name, add to the stack.
@@ -521,7 +552,7 @@ public class Java7SourceGenerator implements ISourceGenerator {
 
         @Override
         public void enterFlow_if(RythmParser.Flow_ifContext ctx) {
-            System.out.println("enterFlow_if()");
+            logger.debug("enterFlow_if()");
             super.enterFlow_if(ctx);
 
             this.flow.append("\t\tif ");
@@ -529,45 +560,45 @@ public class Java7SourceGenerator implements ISourceGenerator {
 
         @Override
         public void exitFlow_if(RythmParser.Flow_ifContext ctx) {
-            System.out.println("exitFlow_if()");
+            logger.debug("exitFlow_if()");
             super.exitFlow_if(ctx);
 
         }
 
         @Override
         public void enterFlow_if_else(RythmParser.Flow_if_elseContext ctx) {
-            System.out.println("enterFlow_if_else");
+            logger.debug("enterFlow_if_else");
             super.enterFlow_if_else(ctx);
             this.flow.append(" else ");
         }
 
         @Override
         public void exitFlow_if_else(RythmParser.Flow_if_elseContext ctx) {
-            System.out.println("exitFlow_if_else");
+            logger.debug("exitFlow_if_else");
             super.exitFlow_if_else(ctx);
         }
 
         @Override
         public void enterFlow_for(RythmParser.Flow_forContext ctx) {
-            System.out.println("enterFlow_for()");
+            logger.debug("enterFlow_for()");
             super.enterFlow_for(ctx);
         }
 
         @Override
         public void exitFlow_for(RythmParser.Flow_forContext ctx) {
-            System.out.println("exitFlow_for()");
+            logger.debug("exitFlow_for()");
             super.exitFlow_for(ctx);
         }
 
         @Override
         public void enterOutputExpression(RythmParser.OutputExpressionContext ctx) {
             super.enterOutputExpression(ctx);
-            System.out.println("enterOutputExpression()");
+            logger.debug("enterOutputExpression()");
         }
 
         @Override
         public void exitOutputExpression(RythmParser.OutputExpressionContext ctx) {
-            System.out.println("exitOutputExpression()");
+            logger.debug("exitOutputExpression()");
             super.exitOutputExpression(ctx);
         }
 
@@ -630,6 +661,14 @@ public class Java7SourceGenerator implements ISourceGenerator {
             } else {
                 return text;
             }
+        }
+
+        public Map<String, String> getLines() {
+            return Collections.emptyMap();
+        }
+
+        public Map<String, String> getMatrix() {
+            return Collections.emptyMap();
         }
     }
 }
