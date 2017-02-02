@@ -66,10 +66,23 @@ public class JDK7TemplateCompiler extends TemplateCompiler {
         final Boolean success = task.call();
 
         if (!success) {
+            /*
+             * We should never get here : If we do, the parser + postprocessor failed to handle this case, and
+             * give a decent error about this.
+             */
             StringBuilder sb = new StringBuilder();
             List<Diagnostic<? extends JavaFileObject>> errors = diagnostics.getDiagnostics();
             for (Diagnostic<? extends JavaFileObject> error : errors) {
-                sb.append(String.format("%s at line %s\n", error.getMessage(Locale.getDefault()), error.getLineNumber()));
+                switch (error.getKind()) {
+                    case ERROR:
+                        sb.append(String.format("%s at line %s\n", error.getMessage(Locale.getDefault()), error.getLineNumber()));
+                        break;
+                    case WARNING:
+                    case MANDATORY_WARNING:
+                    case NOTE:
+                    case OTHER:
+                        break;
+                }
             }
             logger.error("%s", sb.toString());
             throw new RythmCompileException(sb.toString());

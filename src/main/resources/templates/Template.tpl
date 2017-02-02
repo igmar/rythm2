@@ -23,6 +23,7 @@ public final class @@CLASSNAME@@ extends TemplateBase {
     @Override
     public String execute(final IHttpContext context) {
 @@FLOW@@
+        return this.sb.toString();
     }
 
     private void emitAt() {

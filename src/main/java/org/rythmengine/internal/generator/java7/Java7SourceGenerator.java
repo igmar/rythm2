@@ -208,7 +208,7 @@ public class Java7SourceGenerator implements ISourceGenerator {
                     this.imports.append(String.format("import %s;\n", fqn));
                 }
                 this.vars.append(String.format("\tprivate %s %s;\n", fqn, name));
-                this.constructor.append(String.format("\t\tthis.%s = args.get(\"%s\");\n", name, name));
+                this.constructor.append(String.format("\t\tthis.%s = (%s) args.get(\"%s\");\n", name, fqn, name));
             }
         }
 
