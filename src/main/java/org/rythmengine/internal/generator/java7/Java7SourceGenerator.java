@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2016-2017, Igmar Palsenberg. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.rythmengine.internal.generator.java7;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -9,19 +24,20 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.rythmengine.conf.RythmConfiguration;
 import org.rythmengine.internal.ILogger;
+import org.rythmengine.internal.exceptions.RythmCompileException;
 import org.rythmengine.internal.exceptions.RythmGenerateException;
 import org.rythmengine.internal.exceptions.RythmParserException;
 import org.rythmengine.internal.fifo.FIFO;
 import org.rythmengine.internal.fifo.LinkedFIFO;
-import org.rythmengine.internal.generator.ISourceGenerator;
 import org.rythmengine.internal.generator.GeneratedTemplateSource;
+import org.rythmengine.internal.generator.ISourceGenerator;
 import org.rythmengine.internal.hash.sha1.SHA1;
 import org.rythmengine.internal.logger.Logger;
 import org.rythmengine.internal.parser.RythmParser;
 import org.rythmengine.internal.parser.RythmParserBaseListener;
 
-import javax.inject.Singleton;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -30,11 +46,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-@Singleton
 public class Java7SourceGenerator implements ISourceGenerator {
     private static ILogger logger = Logger.get(Java7SourceGenerator.class);
 
-    public Java7SourceGenerator() {
+    private final RythmConfiguration configuration;
+
+    public Java7SourceGenerator(final RythmConfiguration configuration) {
+        this.configuration = configuration;
     }
 
     @Override
@@ -42,14 +60,18 @@ public class Java7SourceGenerator implements ISourceGenerator {
         if (identifier == null || pt == null || tokenStream == null) {
             throw new RythmParserException("Internal error : Bad arguments");
         }
-        
-        logger.info("generateSource()");
 
+        logger.debug("Generating source for %s", identifier);
+
+        /*
+         * We create a new parser / listener on every run : The classes aren't threadsafe
+         */
         final ParseTreeWalker walker = new ParseTreeWalker();
         final Java7Listener listener = new Java7Listener(identifier, tokenStream);
         walker.walk(listener, pt);
 
         final String template = loadTemplate().
+                replace("@@PACKAGE@@", configuration.getCompiledPackage()).
                 replace("@@CLASSNAME@@", listener.getGeneratedClassName()).
                 replace("@@IMPORTS@@", listener.getGeneratedImports()).
                 replace("@@VARS@@", listener.getGeneratedVars()).
@@ -58,7 +80,8 @@ public class Java7SourceGenerator implements ISourceGenerator {
                 replace("@@FLOW@@", listener.getGeneratedFlow()).
                 replace("@@METADATA@@", generateMetaData(source, identifier, listener.getLines(), listener.getMatrix()));
 
-        return new GeneratedTemplateSource(listener.getGeneratedClassName(), template);
+        final String canonicalName = String.format("rythmengine.compiled.%s", listener.getGeneratedClassName());
+        return new GeneratedTemplateSource(canonicalName, template);
     }
 
     private String loadTemplate() throws RythmGenerateException {
@@ -78,12 +101,12 @@ public class Java7SourceGenerator implements ISourceGenerator {
         final String hash = SHA1.sha1Hex(source);
 
         return String.format(
-                "    -- GENERATED --\n" +
-                "    PATH   : %s\n" +
-                "    SHA1   : %s\n" +
-                "    LINES  : %s\n" +
-                "    MATRIX : %s\n" +
-                "    ---------------\n",
+                "    -- GENERATED --%n" +
+                "    PATH   : %s%n" +
+                "    SHA1   : %s%n" +
+                "    LINES  : %s%n" +
+                "    MATRIX : %s%n" +
+                "    ---------------%n",
                 path, hash, flattenMap(lines), flattenMap(matrix));
     }
 
@@ -95,7 +118,7 @@ public class Java7SourceGenerator implements ISourceGenerator {
         return StringUtils.join(t, "|");
     }
 
-    private class Java7Listener extends RythmParserBaseListener {
+    private static class Java7Listener extends RythmParserBaseListener {
         // Debug
         private final Boolean debug = false;
         // Provided
@@ -205,10 +228,10 @@ public class Java7SourceGenerator implements ISourceGenerator {
                 if (fqn.startsWith("java.lang.")) {
                     fqn = fqn.replace("java.lang.", "");
                 } else {
-                    this.imports.append(String.format("import %s;\n", fqn));
+                    this.imports.append(String.format("import %s;%n", fqn));
                 }
-                this.vars.append(String.format("\tprivate %s %s;\n", fqn, name));
-                this.constructor.append(String.format("\t\tthis.%s = (%s) args.get(\"%s\");\n", name, fqn, name));
+                this.vars.append(String.format("\tprivate %s %s;%n", fqn, name));
+                this.constructor.append(String.format("\t\tthis.%s = (%s) args.get(\"%s\");%n", name, fqn, name));
             }
         }
 
@@ -516,7 +539,7 @@ public class Java7SourceGenerator implements ISourceGenerator {
             // Flush the fifo.
             for (int i = 0; i < stack.size(); i++) {
                 String s = stack.peek(i);
-                this.flow.append(String.format("\t\t%s();\n", s));
+                this.flow.append(String.format("\t\t%s();%n", s));
             }
             stack.clear();
         }

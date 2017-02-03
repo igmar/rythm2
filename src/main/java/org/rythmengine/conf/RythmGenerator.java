@@ -15,10 +15,6 @@
  */
 package org.rythmengine.conf;
 
-/**
- * Determines if we use the JDK compiler, or the one from JDT
- */
-public enum RythmCompiler {
-    JDK,
-    JDT
+public enum RythmGenerator {
+    JDK7
 }

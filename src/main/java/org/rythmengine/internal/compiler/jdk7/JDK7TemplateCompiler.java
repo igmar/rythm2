@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2016-2017, Igmar Palsenberg. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.rythmengine.internal.compiler.jdk7;
 
 import org.rythmengine.conf.RythmConfiguration;
@@ -42,7 +57,9 @@ public class JDK7TemplateCompiler extends TemplateCompiler {
 
         if (!configuration.getTemplatedir().exists()) {
             if (!configuration.getTemplatedir().mkdir()) {
-                throw new RythmCompileException(String.format("Can't create template dir %s", configuration.getTemplatedir().getAbsolutePath()));
+                throw new RythmCompileException(
+                        String.format("Can't create template dir %s", configuration.getTemplatedir().getAbsolutePath())
+                );
             }
         }
     }
@@ -70,12 +87,12 @@ public class JDK7TemplateCompiler extends TemplateCompiler {
              * We should never get here : If we do, the parser + postprocessor failed to handle this case, and
              * give a decent error about this.
              */
-            StringBuilder sb = new StringBuilder();
-            List<Diagnostic<? extends JavaFileObject>> errors = diagnostics.getDiagnostics();
+            final StringBuilder sb = new StringBuilder();
+            final List<Diagnostic<? extends JavaFileObject>> errors = diagnostics.getDiagnostics();
             for (Diagnostic<? extends JavaFileObject> error : errors) {
                 switch (error.getKind()) {
                     case ERROR:
-                        sb.append(String.format("%s at line %s\n", error.getMessage(Locale.getDefault()), error.getLineNumber()));
+                        sb.append(String.format("%s at line %s%n", error.getMessage(Locale.getDefault()), error.getLineNumber()));
                         break;
                     case WARNING:
                     case MANDATORY_WARNING:
@@ -97,7 +114,7 @@ public class JDK7TemplateCompiler extends TemplateCompiler {
         return t;
     }
 
-    class JavaSource extends SimpleJavaFileObject {
+    static class JavaSource extends SimpleJavaFileObject {
         private final ParsedTemplate parsedTemplate;
 
         protected JavaSource(ParsedTemplate parsedTemplate) {

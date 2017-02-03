@@ -1,4 +1,4 @@
-package rythmengine.compiled;
+package @@PACKAGE@@;
 
 import java.util.Map;
 import java.lang.StringBuffer;

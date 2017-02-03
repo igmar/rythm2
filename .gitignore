@@ -2,6 +2,9 @@
 # ANRLT
 src/main/antlr4/*.tokens
 
+# Compiler
+__rythm_compiled/*
+
 # Created by https://www.gitignore.io/api/maven
 
 ### Maven ###

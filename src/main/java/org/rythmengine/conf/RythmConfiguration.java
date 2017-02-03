@@ -1,17 +1,29 @@
+/*
+ * Copyright (c) 2016-2017, Igmar Palsenberg. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.rythmengine.conf;
 
 import org.apache.commons.lang3.StringUtils;
 import org.rythmengine.internal.ILogger;
 import org.rythmengine.internal.IResourceLoader;
 import org.rythmengine.internal.exceptions.RythmConfigException;
-import org.rythmengine.internal.generator.DefaultSourceGeneratorProvider;
-import org.rythmengine.internal.generator.ISourceGenerator;
 import org.rythmengine.internal.logger.JDKLogger;
 import org.rythmengine.internal.logger.Logger;
 import org.rythmengine.internal.resourceloader.DefaultResourceLoaderProvider;
 
 import javax.inject.Provider;
-
 import java.io.File;
 
 public final class RythmConfiguration {
@@ -23,8 +35,9 @@ public final class RythmConfiguration {
     private File tempdir;
     private File templatedir;
     private Provider<IResourceLoader> resourceLoaderProvider;
-    private Provider<ISourceGenerator> sourceGeneratorProvider;
+    private RythmGenerator sourceGenerator;
     private RythmCompiler compiler;
+    private String compiledPackage;
 
     private RythmConfiguration(Builder builder) {
         this.id = builder.id;
@@ -35,8 +48,9 @@ public final class RythmConfiguration {
         this.tempdir = builder.tempdir;
         this.templatedir = builder.templatedir;
         this.resourceLoaderProvider = builder.resourceLoaderProvider;
-        this.sourceGeneratorProvider = builder.sourceGeneratorProvider;
+        this.sourceGenerator = builder.sourceGenerator;
         this.compiler = builder.compiler;
+        this.compiledPackage = builder.compiledPackage;
     }
 
     public String getId() {
@@ -71,12 +85,16 @@ public final class RythmConfiguration {
         return resourceLoaderProvider;
     }
 
-    public Provider<ISourceGenerator> getSourceGeneratorProvider() {
-        return sourceGeneratorProvider;
+    public RythmGenerator getSourceGenerator() {
+        return sourceGenerator;
     }
 
     public RythmCompiler getCompiler() {
         return compiler;
+    }
+
+    public String getCompiledPackage() {
+        return compiledPackage;
     }
 
     public static class Builder {
@@ -89,9 +107,9 @@ public final class RythmConfiguration {
         private File templatedir;
 
         private Provider<IResourceLoader> resourceLoaderProvider;
-        private Provider<ISourceGenerator> sourceGeneratorProvider;
-        private Logger logger;
+        private RythmGenerator sourceGenerator;
         private RythmCompiler compiler;
+        private String compiledPackage;
 
         public Builder() {
             // FIXME : Add random prefix
@@ -99,38 +117,37 @@ public final class RythmConfiguration {
             this.classLoader = this.getClass().getClassLoader();
             this.writeEnabled = true;
             this.engineMode = RythmEngineMode.DEV;
-            // FIXME : can throw a NPE
-            //this.homedir = new File(Thread.currentThread().getContextClassLoader().getResource("rythm").getFile());
             this.homedir = new File("/tmp");
             this.tempdir = new File(System.getProperty("java.io.tmpdir"), "__rythm");
-            this.templatedir = new File( "__rythm_compiled");
+            this.templatedir = new File("__rythm_compiled");
             this.resourceLoaderProvider = new DefaultResourceLoaderProvider();
-            this.sourceGeneratorProvider = new DefaultSourceGeneratorProvider();
+            this.sourceGenerator = RythmGenerator.JDK7;
             this.compiler = RythmCompiler.JDT;
+            this.compiledPackage = "rythmengine.compiled";
             Logger.register(JDKLogger.class);
         }
 
-        public Builder id(String id) {
+        public Builder id(final String id) {
             this.id = id;
             return this;
         }
 
-        public Builder classLoader(ClassLoader classLoader) {
+        public Builder classLoader(final ClassLoader classLoader) {
             this.classLoader = classLoader;
             return this;
         }
 
-        public Builder writeEnabled(Boolean writeEnabled) {
+        public Builder writeEnabled(final Boolean writeEnabled) {
             this.writeEnabled = writeEnabled;
             return this;
         }
 
-        public Builder engineMode(RythmEngineMode engineMode) {
+        public Builder engineMode(final RythmEngineMode engineMode) {
             this.engineMode = engineMode;
             return this;
         }
 
-        public Builder homeDir(String homeDir) {
+        public Builder homeDir(final String homeDir) {
             if (StringUtils.isEmpty(homeDir)) {
                 throw new RythmConfigException("homedir is empty");
             }
@@ -145,7 +162,7 @@ public final class RythmConfiguration {
             return this;
         }
 
-        public Builder tempDir(String tempDir) {
+        public Builder tempDir(final String tempDir) {
             if (StringUtils.isEmpty(tempDir)) {
                 throw new RythmConfigException("tempdir is empty");
             }
@@ -160,7 +177,7 @@ public final class RythmConfiguration {
             return this;
         }
 
-        public Builder resourceLoaderProvider(Provider<IResourceLoader> provider) {
+        public Builder resourceLoaderProvider(final Provider<IResourceLoader> provider) {
             if (provider == null) {
                 throw new RythmConfigException("resourceloader is null");
             }
@@ -168,7 +185,7 @@ public final class RythmConfiguration {
             return this;
         }
 
-        public Builder withLogger(ILogger logger) {
+        public Builder withLogger(final ILogger logger) {
             if (logger == null) {
                 throw new RythmConfigException("logger is null");
             }
@@ -176,19 +193,28 @@ public final class RythmConfiguration {
             return this;
         }
 
-        public Builder sourceGeneratorProvider(Provider<ISourceGenerator> provider) {
-            if (provider == null) {
-                throw new RythmConfigException("sourcegenerator provider is null");
+        public Builder sourceGenerator(final RythmGenerator generator) {
+            if (generator == null) {
+                throw new RythmConfigException("source generator is null");
             }
-            this.sourceGeneratorProvider = provider;
+            this.sourceGenerator = generator;
             return this;
         }
 
-        public Builder withCompiler(RythmCompiler compiler) {
+        public Builder withCompiler(final RythmCompiler compiler) {
             if (compiler == null) {
                 throw new RythmConfigException("compiler is null");
             }
             this.compiler = compiler;
+            return this;
+        }
+
+        public Builder withCompiledPackage(final String compiledPackage) {
+            if (StringUtils.isEmpty(compiledPackage)) {
+                throw new RythmConfigException("Package name cannot be empty");
+            }
+            this.compiledPackage = compiledPackage;
+
             return this;
         }
 

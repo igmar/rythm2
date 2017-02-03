@@ -1,23 +1,41 @@
+/*
+ * Copyright (c) 2016-2017, Igmar Palsenberg. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.rythmengine;
 
 import org.apache.commons.io.IOUtils;
 import org.rythmengine.conf.RythmConfiguration;
 import org.rythmengine.conf.RythmEngineMode;
+import org.rythmengine.conf.RythmGenerator;
 import org.rythmengine.internal.IHttpContext;
 import org.rythmengine.internal.ILogger;
 import org.rythmengine.internal.IResourceLoader;
 import org.rythmengine.internal.compiler.CompiledTemplate;
 import org.rythmengine.internal.compiler.jdk7.JDK7TemplateCompiler;
 import org.rythmengine.internal.exceptions.RythmCompileException;
+import org.rythmengine.internal.exceptions.RythmConfigException;
 import org.rythmengine.internal.generator.ISourceGenerator;
+import org.rythmengine.internal.generator.java7.Java7SourceGenerator;
 import org.rythmengine.internal.hash.fnv.FNV;
+import org.rythmengine.internal.logger.Logger;
 import org.rythmengine.internal.parser.ParsedTemplate;
 import org.rythmengine.internal.parser.TemplateParser;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -44,11 +62,13 @@ public final class RythmEngine implements AutoCloseable {
     public RythmEngine(final RythmConfiguration configuration) {
         this.configuration = configuration;
         this.id = configuration.getId();
-        //this.iLogger = Logger.get(RythmEngine.class);
-        this.sourceGenerator = configuration.getSourceGeneratorProvider().get();
+        this.iLogger = Logger.get(RythmEngine.class);
+        this.sourceGenerator = getSourceGenerator(this.configuration.getSourceGenerator());
         compilePool = Executors.newCachedThreadPool();
         parsePool = Executors.newCachedThreadPool();
         templates = new ConcurrentHashMap<>();
+
+        iLogger.info("Starting RythmEngine %s", this.id);
     }
 
     public RythmConfiguration getConfiguration() {
@@ -60,10 +80,9 @@ public final class RythmEngine implements AutoCloseable {
     }
 
     public CompiledTemplate compile(final String identifier, final File input) throws RythmCompileException {
-        try {
-            InputStream is = new FileInputStream(input);
+        try (InputStream is = new FileInputStream(input)){
             return compile(identifier, is);
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             return null;
         }
     }
@@ -112,6 +131,15 @@ public final class RythmEngine implements AutoCloseable {
         } finally {
             parsePool.shutdownNow();
             compilePool.shutdownNow();
+        }
+    }
+
+    private ISourceGenerator getSourceGenerator(final RythmGenerator sourceGenerator) {
+        switch (sourceGenerator) {
+            case JDK7:
+                return new Java7SourceGenerator(this.configuration);
+            default:
+                throw new RythmConfigException(String.format("%s has no source generator", sourceGenerator.name()));
         }
     }
 
