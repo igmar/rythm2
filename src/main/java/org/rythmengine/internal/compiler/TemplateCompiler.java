@@ -27,13 +27,11 @@ import java.util.concurrent.Callable;
 public abstract class TemplateCompiler implements Callable<Map<ParsedTemplate, CompiledTemplate>> {
     protected List<ParsedTemplate> sources;
     protected RythmConfiguration configuration;
-    protected ClassLoader classLoader;
     protected CompiledTemplateLoader templateLoader;
 
     public TemplateCompiler(final RythmConfiguration configuration, final List<ParsedTemplate> parsedTemplates, final ClassLoader classLoader) throws RythmCompileException {
         this.configuration = configuration;
         this.sources = parsedTemplates;
-        this.classLoader = classLoader;
         this.templateLoader = new CompiledTemplateLoader(configuration, classLoader);
     }
 }

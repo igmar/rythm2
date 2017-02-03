@@ -9,6 +9,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 public final class CompiledTemplateLoader {
     private final RythmConfiguration configuration;
@@ -27,14 +29,23 @@ public final class CompiledTemplateLoader {
 
         try {
             final URL[] urls = new URL[]{ baseDir.toURI().toURL() };
-            final ClassLoader cl = new URLClassLoader(urls, classLoader);
-            Class<?> c = cl.loadClass(pt.getName());
+            final Class<?> c = (Class<?>) AccessController.doPrivileged(new PrivilegedAction() {
+                @Override
+                public Object run() {
+                    try {
+                        final ClassLoader cl = new URLClassLoader(urls, classLoader);
+                        return cl.loadClass(pt.getName());
+                    } catch (ClassNotFoundException e) {
+                        return null;
+                    }
+                }
+            });
             if (c != TemplateBase.class && !TemplateBase.class.isAssignableFrom(c)) {
                 throw new RythmCompileException("Loaded class does not extends TemplateBase");
             }
             final Class<? extends TemplateBase> ct = (Class<? extends TemplateBase>) c;
             return new CompiledTemplate(pt, ct);
-        } catch (MalformedURLException | ClassNotFoundException e) {
+        } catch (MalformedURLException e) {
             throw new RythmCompileException(e);
         }
     }
