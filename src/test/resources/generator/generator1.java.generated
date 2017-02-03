@@ -1,0 +1,69 @@
+package rythmengine.compiled;
+
+import java.util.Map;
+import java.lang.StringBuffer;
+import org.rythmengine.internal.*;
+import org.rythmengine.exceptions.RythmTemplateRuntimeException;
+import org.rythmengine.template.TemplateBase;
+
+
+
+
+public final class ct_generator_generator1_html extends TemplateBase {
+    private final StringBuffer sb;
+	private Boolean foo;
+	private Boolean bar;
+	private String gecko;
+
+    public ct_generator_generator1_html(final IHttpContext httpContext, final Map<String, Object> args) {
+        super(httpContext, args);
+        this.sb = new StringBuffer();
+		this.foo = (Boolean) args.get("foo");
+		this.bar = (Boolean) args.get("bar");
+		this.gecko = (String) args.get("gecko");
+
+    }
+
+    @Override
+    public String execute() {
+		templatedata_3();
+		if (foo){
+		templatedata_7();
+		if (bar){
+		templatedata_9();
+		}
+ else {
+		templatedata_11();
+		}
+		templatedata_12();
+		}
+ else {
+		templatedata_14();
+		}
+		templatedata_15();
+
+        return this.sb.toString();
+    }
+
+    private void emitAt() {
+        sb.append("@");
+    }
+
+	private void templatedata_3() {		this.sb.append("\nDit is een test\n\n");	}
+	private void templatedata_7() {		this.sb.append("    BarFoo\n    ");	}
+	private void templatedata_9() {		this.sb.append("        FooBar\n    ");	}
+	private void templatedata_11() {		this.sb.append("        Foo\n    ");	}
+	private void templatedata_12() {		this.sb.append("\n");	}
+	private void templatedata_14() {		this.sb.append("    Bar\n");	}
+	private void templatedata_15() {		this.sb.append("\n\nGeckos rule\n");	}
+
+}
+/*
+    -- GENERATED --
+    PATH   : generator/generator1.html
+    SHA1   : 2c2aefe480d4472c5e93fc8f79541fff1f82f57e
+    LINES  : 
+    MATRIX : 
+    ---------------
+
+*/

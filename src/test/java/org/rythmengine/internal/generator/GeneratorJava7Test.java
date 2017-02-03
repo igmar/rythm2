@@ -18,7 +18,7 @@ public class GeneratorJava7Test extends TestBase {
 
         InputStream is = loadTemplate("generator/generator1.html");
         System.out.println("Loaded ");
-        String expected = loadFile("generator/generator1.java");
+        String expected = loadFileRaw("generator/generator1.java.generated");
         CompiledTemplate result = engine.compile("generator/generator1.html", is);
         String actual = result.source();
 

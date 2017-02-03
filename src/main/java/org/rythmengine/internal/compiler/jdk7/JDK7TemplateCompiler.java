@@ -43,14 +43,14 @@ public class JDK7TemplateCompiler extends TemplateCompiler {
     private static ILogger logger = Logger.get(JDK7TemplateCompiler.class);
     private JavaCompiler compiler;
 
-    public JDK7TemplateCompiler(final RythmConfiguration configuration, final List<ParsedTemplate> parsedTemplates) throws RythmCompileException {
-        super(configuration, parsedTemplates);
+    public JDK7TemplateCompiler(final RythmConfiguration configuration, final List<ParsedTemplate> parsedTemplates, final ClassLoader classLoader) throws RythmCompileException {
+        super(configuration, parsedTemplates, classLoader);
         initialised();
-
     }
 
     private void initialised() throws RythmCompileException {
         compiler = ToolProvider.getSystemJavaCompiler();
+
         if (compiler == null) {
             throw new RythmCompileException("Can't create compiler");
         }
@@ -70,6 +70,7 @@ public class JDK7TemplateCompiler extends TemplateCompiler {
         final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
         final List<JavaSource> units = new ArrayList<>();
         for (ParsedTemplate pt : this.sources) {
+            logger.debug("Adding class for compilation : %s%n", pt.getName());
             units.add(new JavaSource(pt));
         }
 
@@ -105,9 +106,9 @@ public class JDK7TemplateCompiler extends TemplateCompiler {
             throw new RythmCompileException(sb.toString());
         }
 
-        Map<ParsedTemplate, CompiledTemplate> t = new HashMap<>();
+        final Map<ParsedTemplate, CompiledTemplate> t = new HashMap<>();
         for (ParsedTemplate pt : this.sources) {
-            CompiledTemplate ct = new CompiledTemplate(pt);
+            CompiledTemplate ct = templateLoader.load(pt);
             t.put(pt, ct);
         }
 
@@ -117,8 +118,8 @@ public class JDK7TemplateCompiler extends TemplateCompiler {
     static class JavaSource extends SimpleJavaFileObject {
         private final ParsedTemplate parsedTemplate;
 
-        protected JavaSource(ParsedTemplate parsedTemplate) {
-            super(URI.create("string:///" + parsedTemplate.getCanonicalName().replace('.', '/') + Kind.SOURCE.extension), Kind.SOURCE);
+        JavaSource(ParsedTemplate parsedTemplate) {
+            super(URI.create("string:///" + parsedTemplate.getName().replace('.', '/') + Kind.SOURCE.extension), Kind.SOURCE);
             this.parsedTemplate = parsedTemplate;
         }
 

@@ -46,6 +46,19 @@ public class TestBase {
         }
     }
 
+    public String loadFileRaw(String file) {
+        InputStream tpl = this.getClass().getClassLoader().getResourceAsStream(file);
+        if (tpl == null) {
+            return "FILE_NOT_FOUND";
+        }
+
+        try {
+            return IOUtils.toString(tpl, "UTF-8");
+        } catch (IOException e) {
+            return "FILE_NOT_FOUND";
+        }
+    }
+
     public RythmConfiguration createRythmConfiguration() {
         RythmConfiguration configuration = new RythmConfiguration.Builder()
                 .engineMode(RythmEngineMode.DEV)

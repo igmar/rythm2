@@ -12,16 +12,14 @@ import org.rythmengine.template.TemplateBase;
 public final class @@CLASSNAME@@ extends TemplateBase {
     private final StringBuffer sb;
 @@VARS@@
-    public @@CLASSNAME@@(final Map<String, Object> args) {
-        if (args == null) {
-            throw new RythmTemplateRuntimeException("args cannot be null");
-        }
+    public @@CLASSNAME@@(final IHttpContext httpContext, final Map<String, Object> args) {
+        super(httpContext, args);
         this.sb = new StringBuffer();
 @@CONSTRUCTOR@@
     }
 
     @Override
-    public String execute(final IHttpContext context) {
+    public String execute() {
 @@FLOW@@
         return this.sb.toString();
     }

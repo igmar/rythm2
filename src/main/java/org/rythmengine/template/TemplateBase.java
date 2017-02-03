@@ -15,8 +15,24 @@
  */
 package org.rythmengine.template;
 
+import org.rythmengine.exceptions.RythmTemplateRuntimeException;
 import org.rythmengine.internal.IHttpContext;
 
+import java.util.Map;
+
 public abstract class TemplateBase {
-    public abstract String execute(IHttpContext context);
+    protected IHttpContext httpContext;
+    protected Map<String, Object> args;
+
+    protected TemplateBase(IHttpContext httpContext, Map<String, Object> args) {
+        if (httpContext == null) {
+            throw new RythmTemplateRuntimeException("httpContext cannot be null");
+        }
+        if (args == null) {
+            throw new RythmTemplateRuntimeException("args cannot be null");
+        }
+        this.httpContext = httpContext;
+        this.args = args;
+    }
+    public abstract String execute();
 }

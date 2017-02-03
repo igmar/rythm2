@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 public class JDTTemplateCompiler extends TemplateCompiler {
-    public JDTTemplateCompiler(final RythmConfiguration configuration, final List<ParsedTemplate> parsedTemplates) throws RythmCompileException {
-        super(configuration, parsedTemplates);
+    public JDTTemplateCompiler(final RythmConfiguration configuration, final List<ParsedTemplate> parsedTemplates, final ClassLoader classLoader) throws RythmCompileException {
+        super(configuration, parsedTemplates, classLoader);
     }
 
     @Override

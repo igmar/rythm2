@@ -16,36 +16,25 @@
 package org.rythmengine.internal.compiler;
 
 import org.rythmengine.internal.IHttpContext;
-import org.rythmengine.internal.exceptions.RythmCompileException;
 import org.rythmengine.internal.exceptions.RythmTemplateException;
 import org.rythmengine.internal.hash.sha1.SHA1;
 import org.rythmengine.internal.parser.ParsedTemplate;
 import org.rythmengine.template.TemplateBase;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
+
 public final class CompiledTemplate {
     private String path;
     private String source;
     private String hash;
-    private Class<?> c;
-    private ClassLoader cl;
+    private Class<? extends TemplateBase> c;
 
-    public CompiledTemplate(final ParsedTemplate pt) {
+    CompiledTemplate(final ParsedTemplate pt, Class<? extends TemplateBase> c) {
         this.path = pt.path();
-        this.source = pt.source();
+        this.source = pt.getGeneratedSource();
         this.hash = SHA1.sha1Hex(this.source);
-
-        // Load classfile
-        cl = Thread.currentThread().getContextClassLoader();
-        try {
-            this.c = cl.loadClass(pt.getCanonicalName());
-            if (!this.c.isAssignableFrom(TemplateBase.class)) {
-                throw new RythmCompileException(
-                        String.format("%s is not a subclass of TemplateBase.class", this.c.getCanonicalName())
-                );
-            }
-        } catch (ClassNotFoundException e) {
-            throw new RythmCompileException(String.format("Can't load compiled class %s", pt.getCanonicalName()));
-        }
+        this.c = c;
     }
 
     public String path() {
@@ -60,12 +49,12 @@ public final class CompiledTemplate {
         return hash;
     }
 
-    public String execute(IHttpContext context) {
+    public String execute(final IHttpContext context, final Map<String, Object> args) {
         try {
-            TemplateBase t = (TemplateBase) c.newInstance();
-            return t.execute(context);
-        } catch (IllegalAccessException | InstantiationException e) {
-            throw new RythmTemplateException("Can't instantiate class");
+            TemplateBase t = c.getDeclaredConstructor(IHttpContext.class, Map.class).newInstance(context, args);
+            return t.execute();
+        } catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
+            throw new RythmTemplateException(String.format("Can't instantiate class : %s", e));
         }
     }
 }

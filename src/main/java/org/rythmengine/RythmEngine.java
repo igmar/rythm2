@@ -58,8 +58,9 @@ public final class RythmEngine implements AutoCloseable {
     private ConcurrentMap<String, CompiledTemplate> templates;
     private ILogger iLogger;
     private ISourceGenerator sourceGenerator;
+    private ClassLoader classLoader;
 
-    public RythmEngine(final RythmConfiguration configuration) {
+    public RythmEngine(final RythmConfiguration configuration, final ClassLoader classLoader) {
         this.configuration = configuration;
         this.id = configuration.getId();
         this.iLogger = Logger.get(RythmEngine.class);
@@ -67,8 +68,13 @@ public final class RythmEngine implements AutoCloseable {
         compilePool = Executors.newCachedThreadPool();
         parsePool = Executors.newCachedThreadPool();
         templates = new ConcurrentHashMap<>();
+        this.classLoader = classLoader == null ? Thread.currentThread().getContextClassLoader() : classLoader;
 
         iLogger.info("Starting RythmEngine %s", this.id);
+    }
+
+    public RythmEngine(final RythmConfiguration configuration) {
+        this(configuration, null);
     }
 
     public RythmConfiguration getConfiguration() {
@@ -114,8 +120,8 @@ public final class RythmEngine implements AutoCloseable {
         }
     }
 
-    public String execute(final IHttpContext context, final CompiledTemplate template) {
-        return template.execute(context);
+    public String execute(final IHttpContext context, final Map<String, Object> args, final CompiledTemplate template) {
+        return template.execute(context, args);
     }
 
     @Override
@@ -147,7 +153,7 @@ public final class RythmEngine implements AutoCloseable {
         final IResourceLoader resourceLoader = this.configuration.getResourceLoaderProvider().get();
         final Future<ParsedTemplate> parseFuture = parsePool.submit(new TemplateParser(identifier, sourceGenerator, resourceLoader, is));
         final ParsedTemplate pt = parseFuture.get(5, TimeUnit.SECONDS);
-        final Future<Map<ParsedTemplate, CompiledTemplate>> compileFuture = compilePool.submit(new JDK7TemplateCompiler(configuration, Collections.singletonList(pt)));
+        final Future<Map<ParsedTemplate, CompiledTemplate>> compileFuture = compilePool.submit(new JDK7TemplateCompiler(configuration, Collections.singletonList(pt), this.classLoader));
         final Map<ParsedTemplate, CompiledTemplate> ct = compileFuture.get(5, TimeUnit.SECONDS);
         return ct == null ? null : ct.get(pt);
     }

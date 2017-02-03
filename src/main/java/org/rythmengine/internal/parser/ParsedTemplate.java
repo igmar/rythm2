@@ -65,11 +65,11 @@ public final class ParsedTemplate {
         return generatedSource.getSource();
     }
 
-    public String getCanonicalName() {
+    public String getName() {
         if (generatedSource == null) {
             throw new RythmTemplateException("No sources generated");
         }
-        return generatedSource.getCanonicalName();
+        return generatedSource.getName();
     }
 
     private GeneratedTemplateSource generateTemplateSource() throws RythmGenerateException {

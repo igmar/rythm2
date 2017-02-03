@@ -20,12 +20,12 @@ import org.rythmengine.internal.hash.sha1.SHA1;
 
 public final class GeneratedTemplateSource {
     final private String source;
-    final private String canonicalName;
+    final private String name;
     final private String hash;
 
-    public GeneratedTemplateSource(final String canonicalName, final String source) {
+    public GeneratedTemplateSource(final String name, final String source) {
         this.source = source;
-        this.canonicalName = canonicalName;
+        this.name = name;
         this.hash = SHA1.sha1Hex(source);
     }
 
@@ -33,8 +33,8 @@ public final class GeneratedTemplateSource {
         return source;
     }
 
-    public String getCanonicalName() {
-        return canonicalName;
+    public String getName() {
+        return name;
     }
 
     public String hash() {

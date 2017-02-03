@@ -26,7 +26,6 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.rythmengine.conf.RythmConfiguration;
 import org.rythmengine.internal.ILogger;
-import org.rythmengine.internal.exceptions.RythmCompileException;
 import org.rythmengine.internal.exceptions.RythmGenerateException;
 import org.rythmengine.internal.exceptions.RythmParserException;
 import org.rythmengine.internal.fifo.FIFO;
