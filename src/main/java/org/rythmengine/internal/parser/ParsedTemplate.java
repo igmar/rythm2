@@ -31,7 +31,8 @@ public final class ParsedTemplate {
     private String source;
     private GeneratedTemplateSource generatedSource;
 
-    public ParsedTemplate(final String path, final ISourceGenerator sourceGenerator, final ParseTree pt, TokenStream tokenstream, final String source) throws RythmGenerateException {
+    public ParsedTemplate(final String path, final ISourceGenerator sourceGenerator, final ParseTree pt, TokenStream
+            tokenstream, final String source) throws RythmGenerateException {
         assert path != null;
         assert sourceGenerator != null;
         assert pt != null;

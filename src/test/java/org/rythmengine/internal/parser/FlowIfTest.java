@@ -1,14 +1,12 @@
 package org.rythmengine.internal.parser;
 
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.rythmengine.TestBase;
 
 import java.io.InputStream;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 
 /**
  * Created by igmar on 18/07/16.

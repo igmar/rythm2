@@ -24,9 +24,10 @@ import org.rythmengine.internal.parser.RythmLexer;
 import java.util.List;
 
 public final class AntlrDebug {
-    private AntlrDebug() {}
+    private AntlrDebug() {
+    }
 
-    public  static String dumpTerminalNode(TerminalNode tn) {
+    public static String dumpTerminalNode(TerminalNode tn) {
         final StringBuilder sb = new StringBuilder();
         sb.append("--> TERMNALNODE : ").append(tn.hashCode()).append("\n");
         sb.append("class           : ").append(tn.getClass().getSimpleName()).append("\n");
@@ -74,9 +75,11 @@ public final class AntlrDebug {
         final StringBuilder sb = new StringBuilder();
 
         for (Token t : tokens) {
-            if (t.getType() == -1)
+            if (t.getType() == -1) {
                 break;
-            sb.append(String.format("<%s(%s) %s '%s'> ", t.getType(), RythmLexer.ruleNames[t.getType() - 1], t.getChannel() == RythmLexer.HIDDEN ? "H" : "N", StringEscapeUtils.escapeJava(t.getText())));
+            }
+            sb.append(String.format("<%s(%s) %s '%s'> ", t.getType(), RythmLexer.ruleNames[t.getType() - 1], t.getChannel()
+                    == RythmLexer.HIDDEN ? "H" : "N", StringEscapeUtils.escapeJava(t.getText())));
         }
 
         return sb.toString();

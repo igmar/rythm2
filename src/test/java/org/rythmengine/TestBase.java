@@ -22,7 +22,8 @@ public class TestBase {
 
     public RythmParser createParser(InputStream is) {
         try {
-            final TemplateParser templateParser = new TemplateParser("unittests", new TestGenerator(), new TestResourceLoader(), is);
+            final TemplateParser templateParser = new TemplateParser("unittests", new TestGenerator(), new TestResourceLoader()
+                    , is);
             Field field = templateParser.getClass().getDeclaredField("parser");
             field.setAccessible(true);
             return (RythmParser) field.get(templateParser);
@@ -60,14 +61,10 @@ public class TestBase {
     }
 
     public RythmConfiguration createRythmConfiguration() {
-        RythmConfiguration configuration = new RythmConfiguration.Builder()
-                .engineMode(RythmEngineMode.DEV)
-                .homeDir("/tmp")
-                .tempDir("/tmp")
-                .writeEnabled(true)
-                .build();
+        RythmConfiguration configuration = new RythmConfiguration.Builder().engineMode(RythmEngineMode.DEV).homeDir("/tmp")
+                .tempDir("/tmp").writeEnabled(true).build();
         return configuration;
     }
 
-    
+
 }

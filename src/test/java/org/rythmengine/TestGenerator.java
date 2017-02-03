@@ -11,7 +11,8 @@ import org.rythmengine.internal.generator.ISourceGenerator;
  */
 public class TestGenerator implements ISourceGenerator {
     @Override
-    public GeneratedTemplateSource generateSource(final String source, final String path, final ParseTree pt, final TokenStream tokenStream) throws RythmGenerateException {
+    public GeneratedTemplateSource generateSource(final String source, final String path, final ParseTree pt, final TokenStream
+            tokenStream) throws RythmGenerateException {
         return null;
     }
 }

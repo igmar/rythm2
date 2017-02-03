@@ -25,11 +25,9 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.rythmengine.internal.IResourceLoader;
-import org.rythmengine.internal.debug.AntlrDebug;
 import org.rythmengine.internal.exceptions.RythmGenerateException;
 import org.rythmengine.internal.exceptions.RythmParserException;
 import org.rythmengine.internal.generator.ISourceGenerator;
-import org.rythmengine.internal.parser.RythmLexer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,7 +46,8 @@ public final class TemplateParser implements Callable<ParsedTemplate> {
     private ISourceGenerator sourceGenerator;
     private InputStream is;
 
-    public TemplateParser(final String identifier, final ISourceGenerator sourceGenerator, final IResourceLoader resourceLoader, final InputStream template) throws IOException {
+    public TemplateParser(final String identifier, final ISourceGenerator sourceGenerator, final IResourceLoader
+            resourceLoader, final InputStream template) throws IOException {
         assert identifier != null;
         assert sourceGenerator != null;
         assert resourceLoader != null;
@@ -73,7 +72,8 @@ public final class TemplateParser implements Callable<ParsedTemplate> {
         return new ParsedTemplate(identifier, sourceGenerator, pt, tokenstream, this.source);
     }
 
-    private org.rythmengine.internal.parser.RythmParser createParser(String input, IResourceLoader resourceLoader) throws IOException {
+    private org.rythmengine.internal.parser.RythmParser createParser(String input, IResourceLoader resourceLoader) throws
+            IOException {
         CharStream cs = new ANTLRInputStream(input);
         org.rythmengine.internal.parser.RythmLexer lexer = new org.rythmengine.internal.parser.RythmLexer(cs);
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
@@ -102,20 +102,18 @@ public final class TemplateParser implements Callable<ParsedTemplate> {
          * We consider the EOL behind the { to be part of the condition, not whatever follows it
          * So, if we encounter a CURLY_OPEN, the token behind it is a newline
          */
-        boolean curly_open = false;
+        boolean curlyOpen = false;
         final List<Token> tokens = new ArrayList<>(input.size());
         for (int i = 0; i < input.size(); i++) {
             final Token current = input.get(i);
             if (current.getType() == RythmLexer.CURLY_OPEN) {
                 tokens.add(current);
-                curly_open = true;
+                curlyOpen = true;
                 continue;
             }
-            if (curly_open) {
+            if (curlyOpen) {
                 if (current.getType() == RythmLexer.CONTENT) {
-                    if (current.getText().equals("\r") ||
-                        current.getText().equals("\n") ||
-                        current.getText().equals("\r\n")) {
+                    if (current.getText().equals("\r") || current.getText().equals("\n") || current.getText().equals("\r\n")) {
                         CommonToken t = new CommonToken(current);
                         t.setType(RythmLexer.WS);
                         t.setChannel(RythmLexer.HIDDEN);
@@ -124,7 +122,7 @@ public final class TemplateParser implements Callable<ParsedTemplate> {
                         tokens.add(current);
                     }
                 }
-                curly_open = false;
+                curlyOpen = false;
             } else {
                 tokens.add(current);
             }
@@ -142,16 +140,16 @@ public final class TemplateParser implements Callable<ParsedTemplate> {
          */
         final List<Token> tokens = new ArrayList<>(input.size());
 
-        int token_start = -1;
+        int tokenStart = -1;
         for (int i = 0; i < input.size(); i++) {
             final Token current = input.get(i);
             if (current.getType() != RythmLexer.CONTENT) {
-                if (token_start != -1) {
+                if (tokenStart != -1) {
                     final StringBuilder text = new StringBuilder();
                     Token fct = current;
-                    for (int j = token_start; j < current.getTokenIndex(); j++) {
+                    for (int j = tokenStart; j < current.getTokenIndex(); j++) {
                         final Token t = input.get(j);
-                        if (j == token_start) {
+                        if (j == tokenStart) {
                             fct = t;
                         }
                         text.append(t.getText());
@@ -163,14 +161,14 @@ public final class TemplateParser implements Callable<ParsedTemplate> {
                     tokens.add(t);
                     t = new CommonToken(current);
                     tokens.add(t);
-                    token_start = -1;
+                    tokenStart = -1;
                 } else {
                     CommonToken t = new CommonToken(current);
                     tokens.add(t);
                 }
             } else {
-                if (token_start == -1) {
-                    token_start = i;
+                if (tokenStart == -1) {
+                    tokenStart = i;
                 }
             }
         }
@@ -191,10 +189,8 @@ public final class TemplateParser implements Callable<ParsedTemplate> {
                 }
                 final Token previous = input.get(i - 1);
                 final Token next = input.get(i + 1);
-                if (previous.getType() == RythmLexer.CONTENT &&
-                        StringUtils.isWhitespace(previous.getText())) {
-                    if (next.getType() ==RythmLexer.WS &&
-                        StringUtils.isWhitespace(next.getText())) {
+                if (previous.getType() == RythmLexer.CONTENT && StringUtils.isWhitespace(previous.getText())) {
+                    if (next.getType() == RythmLexer.WS && StringUtils.isWhitespace(next.getText())) {
                         // Matches. Fixup the tokens
                         final CommonToken cp = (CommonToken) previous;
                         cp.setType(RythmLexer.WS);

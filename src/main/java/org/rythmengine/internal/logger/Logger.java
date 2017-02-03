@@ -26,7 +26,8 @@ public final class Logger {
     private static Class<? extends ILogger> loggerClass;
     private static Map<Class<?>, ILogger> loggers = new ConcurrentHashMap<>();
 
-    private Logger() {}
+    private Logger() {
+    }
 
     public static synchronized ILogger get(Class<?> c) {
         ILogger logger = loggers.get(c);

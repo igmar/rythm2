@@ -55,7 +55,8 @@ public class Java7SourceGenerator implements ISourceGenerator {
     }
 
     @Override
-    public GeneratedTemplateSource generateSource(final String source, final String identifier, final ParseTree pt, final TokenStream tokenStream) throws RythmGenerateException {
+    public GeneratedTemplateSource generateSource(final String source, final String identifier, final ParseTree pt, final
+    TokenStream tokenStream) throws RythmGenerateException {
         if (identifier == null || pt == null || tokenStream == null) {
             throw new RythmParserException("Internal error : Bad arguments");
         }
@@ -96,17 +97,12 @@ public class Java7SourceGenerator implements ISourceGenerator {
         }
     }
 
-    private String generateMetaData(final String source, final String path, Map<String, String> lines, Map<String, String> matrix) {
+    private String generateMetaData(final String source, final String path, Map<String, String> lines, Map<String, String>
+            matrix) {
         final String hash = SHA1.sha1Hex(source);
 
-        return String.format(
-                "    -- GENERATED --%n" +
-                "    PATH   : %s%n" +
-                "    SHA1   : %s%n" +
-                "    LINES  : %s%n" +
-                "    MATRIX : %s%n" +
-                "    ---------------%n",
-                path, hash, flattenMap(lines), flattenMap(matrix));
+        return String.format("    -- GENERATED --%n" + "    PATH   : %s%n" + "    SHA1   : %s%n" + "    LINES  : %s%n" + "    " +
+                "MATRIX : %s%n" + "    ---------------%n", path, hash, flattenMap(lines), flattenMap(matrix));
     }
 
     private String flattenMap(final Map<String, String> lines) {
@@ -132,7 +128,7 @@ public class Java7SourceGenerator implements ISourceGenerator {
         private final StringBuffer functions;
         private final StringBuffer vars;
         private final FIFO<String> stack;
-        
+
         public Java7Listener(final String identifier, final TokenStream tokenStream) {
 
             this.identifier = identifier;

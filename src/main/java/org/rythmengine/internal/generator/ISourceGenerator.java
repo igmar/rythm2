@@ -20,5 +20,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.rythmengine.internal.exceptions.RythmGenerateException;
 
 public interface ISourceGenerator {
-    GeneratedTemplateSource generateSource(final String source, final String identifier, final ParseTree pt, final TokenStream tokenStream) throws RythmGenerateException;
+    GeneratedTemplateSource generateSource(final String source, final String identifier, final ParseTree pt, final TokenStream
+            tokenStream) throws RythmGenerateException;
 }

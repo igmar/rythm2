@@ -19,7 +19,6 @@ import org.rythmengine.conf.RythmConfiguration;
 import org.rythmengine.internal.exceptions.RythmCompileException;
 import org.rythmengine.internal.parser.ParsedTemplate;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -29,7 +28,8 @@ public abstract class TemplateCompiler implements Callable<Map<ParsedTemplate, C
     protected RythmConfiguration configuration;
     protected CompiledTemplateLoader templateLoader;
 
-    public TemplateCompiler(final RythmConfiguration configuration, final List<ParsedTemplate> parsedTemplates, final ClassLoader classLoader) throws RythmCompileException {
+    public TemplateCompiler(final RythmConfiguration configuration, final List<ParsedTemplate> parsedTemplates, final
+    ClassLoader classLoader) throws RythmCompileException {
         this.configuration = configuration;
         this.sources = parsedTemplates;
         this.templateLoader = new CompiledTemplateLoader(configuration, classLoader);

@@ -43,7 +43,8 @@ public class JDK7TemplateCompiler extends TemplateCompiler {
     private static ILogger logger = Logger.get(JDK7TemplateCompiler.class);
     private JavaCompiler compiler;
 
-    public JDK7TemplateCompiler(final RythmConfiguration configuration, final List<ParsedTemplate> parsedTemplates, final ClassLoader classLoader) throws RythmCompileException {
+    public JDK7TemplateCompiler(final RythmConfiguration configuration, final List<ParsedTemplate> parsedTemplates, final
+    ClassLoader classLoader) throws RythmCompileException {
         super(configuration, parsedTemplates, classLoader);
         initialised();
     }
@@ -57,9 +58,8 @@ public class JDK7TemplateCompiler extends TemplateCompiler {
 
         if (!configuration.getTemplatedir().exists()) {
             if (!configuration.getTemplatedir().mkdir()) {
-                throw new RythmCompileException(
-                        String.format("Can't create template dir %s", configuration.getTemplatedir().getAbsolutePath())
-                );
+                throw new RythmCompileException(String.format("Can't create template dir %s", configuration.getTemplatedir()
+                        .getAbsolutePath()));
             }
         }
     }
@@ -75,7 +75,8 @@ public class JDK7TemplateCompiler extends TemplateCompiler {
         }
 
         final StringWriter sw = new StringWriter();
-        final StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, Locale.ENGLISH, Charset.defaultCharset());
+        final StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, Locale.ENGLISH, Charset
+                .defaultCharset());
         final List<String> options = new ArrayList<>();
 
         options.add("-d");
@@ -99,6 +100,7 @@ public class JDK7TemplateCompiler extends TemplateCompiler {
                     case MANDATORY_WARNING:
                     case NOTE:
                     case OTHER:
+                    default:
                         break;
                 }
             }

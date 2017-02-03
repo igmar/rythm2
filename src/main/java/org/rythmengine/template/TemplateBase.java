@@ -34,5 +34,6 @@ public abstract class TemplateBase {
         this.httpContext = httpContext;
         this.args = args;
     }
+
     public abstract String execute();
 }

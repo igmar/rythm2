@@ -51,6 +51,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public final class RythmEngine implements AutoCloseable {
+    private static final Integer DEFAULT_TIMEOUT = 5;
     private RythmConfiguration configuration;
     private String id;
     private ExecutorService compilePool;
@@ -86,7 +87,7 @@ public final class RythmEngine implements AutoCloseable {
     }
 
     public CompiledTemplate compile(final String identifier, final File input) throws RythmCompileException {
-        try (InputStream is = new FileInputStream(input)){
+        try (InputStream is = new FileInputStream(input)) {
             return compile(identifier, is);
         } catch (IOException e) {
             return null;
@@ -128,9 +129,9 @@ public final class RythmEngine implements AutoCloseable {
     public void close() throws Exception {
         try {
             parsePool.shutdown();
-            parsePool.awaitTermination(5, TimeUnit.SECONDS);
+            parsePool.awaitTermination(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
             compilePool.shutdown();
-            compilePool.awaitTermination(5, TimeUnit.SECONDS);
+            compilePool.awaitTermination(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
             templates.clear();
         } catch (InterruptedException e) {
             // Eat it
@@ -149,12 +150,15 @@ public final class RythmEngine implements AutoCloseable {
         }
     }
 
-    private CompiledTemplate compileTemplate(final String identifier, final InputStream is) throws InterruptedException, java.util.concurrent.ExecutionException, java.util.concurrent.TimeoutException, IOException {
+    private CompiledTemplate compileTemplate(final String identifier, final InputStream is) throws InterruptedException, java
+            .util.concurrent.ExecutionException, java.util.concurrent.TimeoutException, IOException {
         final IResourceLoader resourceLoader = this.configuration.getResourceLoaderProvider().get();
-        final Future<ParsedTemplate> parseFuture = parsePool.submit(new TemplateParser(identifier, sourceGenerator, resourceLoader, is));
-        final ParsedTemplate pt = parseFuture.get(5, TimeUnit.SECONDS);
-        final Future<Map<ParsedTemplate, CompiledTemplate>> compileFuture = compilePool.submit(new JDK7TemplateCompiler(configuration, Collections.singletonList(pt), this.classLoader));
-        final Map<ParsedTemplate, CompiledTemplate> ct = compileFuture.get(5, TimeUnit.SECONDS);
+        final Future<ParsedTemplate> parseFuture = parsePool.submit(new TemplateParser(identifier, sourceGenerator,
+                resourceLoader, is));
+        final ParsedTemplate pt = parseFuture.get(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
+        final Future<Map<ParsedTemplate, CompiledTemplate>> compileFuture = compilePool.submit(new JDK7TemplateCompiler(
+                configuration, Collections.singletonList(pt), this.classLoader));
+        final Map<ParsedTemplate, CompiledTemplate> ct = compileFuture.get(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
         return ct == null ? null : ct.get(pt);
     }
 
