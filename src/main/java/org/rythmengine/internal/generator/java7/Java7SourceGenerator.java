@@ -184,6 +184,11 @@ public class Java7SourceGenerator implements ISourceGenerator {
         public void enterForExpression(RythmParser.ForExpressionContext ctx) {
             logger.debug("enterForExpression()");
             super.enterForExpression(ctx);
+
+            this.flow.append(String.format("for (%s %s; %s; %s)\t", ctx.integralType().getText(),
+                    ctx.variableDeclarator().getText(),
+                    ctx.expression(0).getText(),
+                    ctx.expression(1).getText()));
         }
 
         @Override
@@ -192,6 +197,18 @@ public class Java7SourceGenerator implements ISourceGenerator {
             super.exitForExpression(ctx);
         }
 
+        @Override
+        public void enterEnhancedForExpression(RythmParser.EnhancedForExpressionContext ctx) {
+            logger.debug("enterEnhancedForExpression()");
+            super.enterEnhancedForExpression(ctx);
+        }
+
+        @Override
+        public void exitEnhancedForExpression(RythmParser.EnhancedForExpressionContext ctx) {
+            logger.debug("exitEnhancedForExpression()");
+            super.exitEnhancedForExpression(ctx);
+        }
+        
         @Override
         public void enterArgs(RythmParser.ArgsContext ctx) {
             logger.debug("enterArgs()");

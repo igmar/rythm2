@@ -33,4 +33,24 @@ public class ExecutorTest extends TestBase {
 
         assertEquals(expected, actual);
     }
+
+    @Test
+    public void executorTest2() {
+        RythmConfiguration config = createRythmConfiguration();
+        RythmEngine engine = new RythmEngine(config);
+
+        Map<String, Object> args = new HashMap<>();
+        args.put("foo", Boolean.TRUE);
+        args.put("bar", Boolean.FALSE);
+        args.put("gecko", "This is a string");
+        IHttpContext httpContext = new IHttpContext() {
+        };
+
+        InputStream is = loadTemplate("executor/executor2.html");
+        String expected = loadFileRaw("executor/executor2.html.exp");
+        CompiledTemplate result = engine.compile("executor/executor2.html", is);
+        String actual = result.execute(httpContext, args);
+
+        assertEquals(expected, actual);
+    }
 }
