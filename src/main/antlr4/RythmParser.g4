@@ -59,6 +59,7 @@ flow_if_else
 
 flow_for
     : AT FOR_BLOCK_START forExpression block
+    | AT FOR_BLOCK_START enhancedForExpression block
     ;
 
 outputExpression
@@ -93,8 +94,11 @@ block
     ;
 
 forExpression
+    : PARENTHESIS_OPEN integralType variableDeclarator SEMICOLON expression SEMICOLON expression PARENTHESIS_CLOSE
+    ;
+
+enhancedForExpression
     : PARENTHESIS_OPEN qualifiedName IDENTIFIER COLON IDENTIFIER PARENTHESIS_CLOSE
-    | PARENTHESIS_OPEN integralType variableDeclarator SEMICOLON expression SEMICOLON expression PARENTHESIS_CLOSE
     ;
 
 args

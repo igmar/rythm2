@@ -1,1 +1,1 @@
-(template (elements (templatedata (templatedataelement {}\n\n))) (elements (flow_for @ for (forExpression ( (qualifiedName FooBar) foo : bar )) (block { }))) (elements (templatedata (templatedataelement \n\n{}\n))))
+(template (elements (templatedata (templatedataelement {}\n\n))) (elements (flow_for @ for (enhancedForExpression ( (qualifiedName FooBar) foo : bar )) (block { }))) (elements (templatedata (templatedataelement \n\n{}\n))))
