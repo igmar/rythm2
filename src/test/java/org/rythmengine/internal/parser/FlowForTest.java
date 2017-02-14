@@ -44,4 +44,15 @@ public class FlowForTest extends TestBase {
         assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals(expected, actual);
     }
+
+    @Test
+    public void testRangeClassOEFor() {
+        InputStream is = loadTemplate("flow_for/flow_for4.html");
+        String expected = loadFile("flow_for/flow_for4.html.exp");
+        org.rythmengine.internal.parser.RythmParser parser = createParser(is);
+        ParseTree pt = parser.template();
+        String actual = pt.toStringTree(parser);
+        assertEquals(0, parser.getNumberOfSyntaxErrors());
+        assertEquals(expected, actual);
+    }
 }
