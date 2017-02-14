@@ -34,6 +34,7 @@ elements
     | flow_if
     | flow_for
     | outputExpression
+    | outputExpressionPlaceholder
     | flow_return
     | macro
     | include
@@ -60,12 +61,17 @@ flow_if_else
 flow_for
     : AT FOR_BLOCK_START forExpression block
     | AT FOR_BLOCK_START enhancedForExpression block
+    | AT FOR_BLOCK_START numrangeExpression block
     ;
 
 outputExpression
     : AT OE_START DOT canonicalName OE_END
     | AT OE_START DOT canonicalName PARENTHESIS_OPEN methodArguments* PARENTHESIS_CLOSE OE_END
     | AT COE_START IDENTIFIER DOT canonicalName PARENTHESIS_OPEN methodArguments* PARENTHESIS_CLOSE COE_END
+    ;
+
+outputExpressionPlaceholder
+    : AT UOE_START OE_END
     ;
 
 canonicalName
@@ -101,12 +107,17 @@ enhancedForExpression
     : PARENTHESIS_OPEN qualifiedName IDENTIFIER COLON IDENTIFIER PARENTHESIS_CLOSE
     ;
 
+numrangeExpression
+    : PARENTHESIS_OPEN BRACKET_OPEN integerLiteral DOT DOT integerLiteral BRACKET_CLOSE PARENTHESIS_CLOSE
+    | PARENTHESIS_OPEN integerLiteral DOT DOT integerLiteral PARENTHESIS_CLOSE
+    ;
+
 args
     : AT ARGS_START templateArgument (COMMA templateArgument)* ARGS_END
     ;
 
 templateArgument
-    : qualifiedName IDENTIFIER
+    : javaGenericType IDENTIFIER
     ;
 
 variableDeclarator
@@ -235,7 +246,9 @@ javaBlock
     : AT CURLY_OPEN JAVA_BLOCK_CODE* CURLY_CLOSE
     ;
 
-
+javaGenericType
+    : qualifiedName (LT qualifiedName GT)?
+    ;
 
 qualifiedName
     : IDENTIFIER (DOT IDENTIFIER)*

@@ -56,7 +56,7 @@ public class FlowIfTest extends TestBase {
         assertEquals(expected, actual);
     }
 
-    @Test
+    @Test(expected=org.rythmengine.internal.exceptions.RythmParserException.class)
     public void testBadElse() {
         InputStream is = loadTemplate("flow_if/flow_if5.html");
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);

@@ -28,6 +28,7 @@ import org.rythmengine.internal.IResourceLoader;
 import org.rythmengine.internal.exceptions.RythmGenerateException;
 import org.rythmengine.internal.exceptions.RythmParserException;
 import org.rythmengine.internal.generator.ISourceGenerator;
+import org.rythmengine.internal.parser.RythmLexer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -93,6 +94,8 @@ public final class TemplateParser implements Callable<ParsedTemplate> {
 
         org.rythmengine.internal.parser.RythmParser parser = new org.rythmengine.internal.parser.RythmParser(tokenStream);
         parser.setResourceLoader(resourceLoader);
+        parser.removeErrorListeners();
+        parser.addErrorListener(new ErrorListener());
 
         return parser;
     }

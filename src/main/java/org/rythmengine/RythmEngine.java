@@ -144,7 +144,7 @@ public final class RythmEngine implements AutoCloseable {
     private ISourceGenerator getSourceGenerator(final RythmGenerator sourceGenerator) {
         switch (sourceGenerator) {
             case JDK7:
-                return new Java7SourceGenerator(this.configuration);
+                return new Java7SourceGenerator(this.configuration, this.classLoader);
             default:
                 throw new RythmConfigException(String.format("%s has no source generator", sourceGenerator.name()));
         }

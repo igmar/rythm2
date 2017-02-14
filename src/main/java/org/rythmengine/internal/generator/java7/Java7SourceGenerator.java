@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.rythmengine.conf.RythmConfiguration;
 import org.rythmengine.internal.ILogger;
+import org.rythmengine.internal.exceptions.RythmCompileException;
 import org.rythmengine.internal.exceptions.RythmGenerateException;
 import org.rythmengine.internal.exceptions.RythmParserException;
 import org.rythmengine.internal.fifo.FIFO;
@@ -49,9 +50,11 @@ public class Java7SourceGenerator implements ISourceGenerator {
     private static ILogger logger = Logger.get(Java7SourceGenerator.class);
 
     private final RythmConfiguration configuration;
+    private final ClassLoader classLoader;
 
-    public Java7SourceGenerator(final RythmConfiguration configuration) {
+    public Java7SourceGenerator(final RythmConfiguration configuration, final ClassLoader classLoader) {
         this.configuration = configuration;
+        this.classLoader = classLoader;
     }
 
     @Override
@@ -67,7 +70,7 @@ public class Java7SourceGenerator implements ISourceGenerator {
          * We create a new parser / listener on every run : The classes aren't threadsafe
          */
         final ParseTreeWalker walker = new ParseTreeWalker();
-        final Java7Listener listener = new Java7Listener(identifier, tokenStream);
+        final Java7Listener listener = new Java7Listener(identifier, tokenStream, classLoader);
         walker.walk(listener, pt);
 
         final String template = loadTemplate().
@@ -119,6 +122,7 @@ public class Java7SourceGenerator implements ISourceGenerator {
         // Provided
         private final String identifier;
         private final TokenStream tokenStream;
+        private final ClassLoader classLoader;
 
         // Generated
         private String className;
@@ -129,10 +133,11 @@ public class Java7SourceGenerator implements ISourceGenerator {
         private final StringBuffer vars;
         private final FIFO<String> stack;
 
-        public Java7Listener(final String identifier, final TokenStream tokenStream) {
+        public Java7Listener(final String identifier, final TokenStream tokenStream, final ClassLoader classLoader) {
 
             this.identifier = identifier;
             this.tokenStream = tokenStream;
+            this.classLoader = classLoader;
 
             this.flow = new StringBuffer();
             this.constructor = new StringBuffer();
@@ -687,14 +692,21 @@ public class Java7SourceGenerator implements ISourceGenerator {
             super.exitMethodArguments(ctx);
         }
 
-        /*
-         * FIXME. See mail Miel
-         */
-        private String getClassName(String text) {
-            if (!text.contains(".")) {
-                return "java.lang." + text;
+        private String getClassName(String className) {
+            final String[] packageNames = { "java.lang", "java.util" };
+            if (!className.contains(".")) {
+                for (String packageName : packageNames) {
+                    final String fqqn = String.format("%s.%s", packageName, className);
+                    try {
+                        Class.forName(fqqn, false, classLoader);
+                    } catch (ClassNotFoundException e) {
+                        continue;
+                    }
+                    return fqqn;
+                }
+                return null;
             } else {
-                return text;
+                return className;
             }
         }
 

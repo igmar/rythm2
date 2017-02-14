@@ -1,1 +1,1 @@
-(template (elements (args @ args (templateArgument (qualifiedName FooBar) myfoobar) , (templateArgument (qualifiedName Integer) myinteger) \n)))
+(template (elements (args @ args (templateArgument (javaGenericType (qualifiedName FooBar)) myfoobar) , (templateArgument (javaGenericType (qualifiedName Integer)) myinteger) \n)))
