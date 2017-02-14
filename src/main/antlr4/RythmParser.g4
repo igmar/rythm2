@@ -65,7 +65,7 @@ flow_for
     ;
 
 outputExpression
-    : AT OE_START DOT canonicalName OE_END
+    : AT OE_START (DOT canonicalName)? OE_END
     | AT OE_START DOT canonicalName PARENTHESIS_OPEN methodArguments* PARENTHESIS_CLOSE OE_END
     | AT COE_START IDENTIFIER DOT canonicalName PARENTHESIS_OPEN methodArguments* PARENTHESIS_CLOSE COE_END
     ;
