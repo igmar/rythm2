@@ -16,7 +16,6 @@
 package org.rythmengine.internal.generator.java7;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -25,8 +24,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.rythmengine.conf.RythmConfiguration;
-import org.rythmengine.internal.ILogger;
-import org.rythmengine.internal.exceptions.RythmCompileException;
+import org.rythmengine.ILogger;
 import org.rythmengine.internal.exceptions.RythmGenerateException;
 import org.rythmengine.internal.exceptions.RythmParserException;
 import org.rythmengine.internal.fifo.FIFO;
@@ -43,14 +41,18 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Java7SourceGenerator implements ISourceGenerator {
     private static ILogger logger = Logger.get(Java7SourceGenerator.class);
+    private static final String[] packageNames = { "java.lang.", "java.util." };
 
     private final RythmConfiguration configuration;
     private final ClassLoader classLoader;
+
 
     public Java7SourceGenerator(final RythmConfiguration configuration, final ClassLoader classLoader) {
         this.configuration = configuration;
@@ -117,8 +119,6 @@ public class Java7SourceGenerator implements ISourceGenerator {
     }
 
     private static class Java7Listener extends RythmParserBaseListener {
-        // Debug
-        private final Boolean debug = false;
         // Provided
         private final String identifier;
         private final TokenStream tokenStream;
@@ -127,10 +127,11 @@ public class Java7SourceGenerator implements ISourceGenerator {
         // Generated
         private String className;
         private final StringBuffer flow;
-        private final StringBuffer imports;
+        private final Set<String> imports;
+        private final StringBuffer vars;
         private final StringBuffer constructor; // Maps to @@CONSTRUCTOR@@
         private final StringBuffer functions;
-        private final StringBuffer vars;
+        private final FIFO<String> templateDataStack;
         private final FIFO<String> stack;
 
         public Java7Listener(final String identifier, final TokenStream tokenStream, final ClassLoader classLoader) {
@@ -143,7 +144,8 @@ public class Java7SourceGenerator implements ISourceGenerator {
             this.constructor = new StringBuffer();
             this.functions = new StringBuffer();
             this.vars = new StringBuffer();
-            this.imports = new StringBuffer();
+            this.imports = new LinkedHashSet<>();
+            this.templateDataStack = new LinkedFIFO<>();
             this.stack = new LinkedFIFO<>();
         }
 
@@ -152,7 +154,12 @@ public class Java7SourceGenerator implements ISourceGenerator {
         }
 
         public String getGeneratedImports() {
-            return this.imports.toString();
+            // FIXME : remove imports provided by the language and imported by default
+            final StringBuilder sb = new StringBuilder();
+            for (String imp : this.imports) {
+                sb.append(String.format("import %s;%n", imp));
+            }
+            return sb.toString();
         }
 
         public String getGeneratedConstructor() {
@@ -190,7 +197,7 @@ public class Java7SourceGenerator implements ISourceGenerator {
             logger.debug("enterForExpression()");
             super.enterForExpression(ctx);
 
-            this.flow.append(String.format("for (%s %s; %s; %s)\t", ctx.integralType().getText(),
+            this.flow.append(String.format("for (%s %s; %s; %s) ", ctx.integralType().getText(),
                     ctx.variableDeclarator().getText(),
                     ctx.expression(0).getText(),
                     ctx.expression(1).getText()));
@@ -206,6 +213,9 @@ public class Java7SourceGenerator implements ISourceGenerator {
         public void enterEnhancedForExpression(RythmParser.EnhancedForExpressionContext ctx) {
             logger.debug("enterEnhancedForExpression()");
             super.enterEnhancedForExpression(ctx);
+
+            this.stack.push(ctx.IDENTIFIER(0).getText());
+            this.flow.append(String.format("for (%s %s : %s) ", ctx.qualifiedName().getText(), ctx.IDENTIFIER(0).getText(), ctx.IDENTIFIER(1).getText()));
         }
 
         @Override
@@ -213,7 +223,19 @@ public class Java7SourceGenerator implements ISourceGenerator {
             logger.debug("exitEnhancedForExpression()");
             super.exitEnhancedForExpression(ctx);
         }
-        
+
+        @Override
+        public void enterNumrangeExpression(RythmParser.NumrangeExpressionContext ctx) {
+            logger.debug("enterNumrangeExpression()");
+            super.enterNumrangeExpression(ctx);
+        }
+
+        @Override
+        public void exitNumrangeExpression(RythmParser.NumrangeExpressionContext ctx) {
+            logger.debug("exitNumrangeExpression()");
+            super.exitNumrangeExpression(ctx);
+        }
+
         @Override
         public void enterArgs(RythmParser.ArgsContext ctx) {
             logger.debug("enterArgs()");
@@ -230,25 +252,33 @@ public class Java7SourceGenerator implements ISourceGenerator {
              * lookup the class, write  the @@VARS@@ and @@CONSTRUCTOR@@
              */
             for (RythmParser.TemplateArgumentContext arg : ctx.templateArgument()) {
-                final Token type = arg.getStart();
-                final TerminalNode name = arg.IDENTIFIER();
-                final Class<?> typeRef;
-                String fqn = getClassName(type.getText());
+                final String genericType = arg.javaGenericType().qualifiedName(0).getText();
+                final String boxedType = arg.javaGenericType().qualifiedName().size() > 1 ? arg.javaGenericType().qualifiedName(1).getText() : null;
+                final TerminalNode name = arg.IDENTIFIER();;
+                final String genericFQN = getClassName(genericType);
+                final String boxedFQN = boxedType != null ? getClassName(boxedType) : null;
 
                 try {
-                    typeRef = Class.forName(fqn);
+                    /* These are always on the source line */
+                    final Class<?> typeRef = Class.forName(genericFQN);
+                    final Class<?> boxedRef;
+                    if (boxedFQN != null) {
+                        boxedRef = Class.forName(boxedFQN);
+                    }
                 } catch (ClassNotFoundException e) {
                     // FIXME: Make this into a proper error, including the offending line number in the source.
                     throw new RythmParserException(e);
                 }
-
-                if (fqn.startsWith("java.lang.")) {
-                    fqn = fqn.replace("java.lang.", "");
+                
+                this.imports.add(genericFQN);
+                if (boxedFQN != null) {
+                    this.imports.add(boxedFQN);
+                    this.vars.append(String.format("\tprivate %s<%s> %s;%n", genericFQN, boxedFQN, name));
+                    this.constructor.append(String.format("\t\tthis.%s = (%s<%s>) args.get(\"%s\");%n", name, genericFQN, boxedFQN, name));
                 } else {
-                    this.imports.append(String.format("import %s;%n", fqn));
+                    this.vars.append(String.format("\tprivate %s %s;%n", genericFQN, name));
+                    this.constructor.append(String.format("\t\tthis.%s = (%s) args.get(\"%s\");%n", name, genericFQN, name));
                 }
-                this.vars.append(String.format("\tprivate %s %s;%n", fqn, name));
-                this.constructor.append(String.format("\t\tthis.%s = (%s) args.get(\"%s\");%n", name, fqn, name));
             }
         }
 
@@ -553,12 +583,12 @@ public class Java7SourceGenerator implements ISourceGenerator {
             logger.debug("exitElements()");
             super.exitElements(ctx);
 
-            // Flush the fifo.
-            for (int i = 0; i < stack.size(); i++) {
-                String s = stack.peek(i);
+            // Flush the template data stack.
+            for (int i = 0; i < templateDataStack.size(); i++) {
+                String s = templateDataStack.peek(i);
                 this.flow.append(String.format("\t\t%s();%n", s));
             }
-            stack.clear();
+            templateDataStack.clear();
         }
 
         @Override
@@ -572,9 +602,9 @@ public class Java7SourceGenerator implements ISourceGenerator {
             logger.debug("exitTemplatedata()");
             super.exitTemplatedata(ctx);
 
-            // Create a proper function name, add to the stack.
+            // Create a proper function name, add to the templateDataStack.
             final String functionName = String.format("templatedata_%s", ctx.getStart().getLine());
-            stack.push(functionName);
+            templateDataStack.push(functionName);
             this.functions.append(String.format("\tprivate void %s() {", functionName));
             this.functions.append(String.format("\t\tthis.sb.append(\"%s\");", StringEscapeUtils.escapeJava(ctx.getText())));
             this.functions.append("\t}\n");
@@ -632,14 +662,82 @@ public class Java7SourceGenerator implements ISourceGenerator {
 
         @Override
         public void enterOutputExpression(RythmParser.OutputExpressionContext ctx) {
-            super.enterOutputExpression(ctx);
             logger.debug("enterOutputExpression()");
+            super.enterOutputExpression(ctx);
         }
 
         @Override
         public void exitOutputExpression(RythmParser.OutputExpressionContext ctx) {
             logger.debug("exitOutputExpression()");
             super.exitOutputExpression(ctx);
+        }
+
+        @Override
+        public void enterSimpleOutputExpression(RythmParser.SimpleOutputExpressionContext ctx) {
+            /*
+             * AT OE_START (DOT canonicalName)? OE_END
+             */
+            logger.debug("enterSimpleOutputExpression()");
+            super.enterSimpleOutputExpression(ctx);
+
+            String varName = ctx.OE_START().getText();
+            if (ctx.canonicalName().size() > 0) {
+                for (RythmParser.CanonicalNameContext cc : ctx.canonicalName()) {
+                    varName = varName + "." + cc.getText();
+                }
+            }
+            this.flow.append(String.format("\tthis.sb.append(%s.toString());%n", varName));
+        }
+
+        @Override
+        public void exitSimpleOutputExpression(RythmParser.SimpleOutputExpressionContext ctx) {
+            logger.debug("exitSimpleOutputExpression()");
+            super.exitSimpleOutputExpression(ctx);
+        }
+
+        @Override
+        public void enterArgsOutputExpression(RythmParser.ArgsOutputExpressionContext ctx) {
+            /*
+             * AT OE_START DOT canonicalName PARENTHESIS_OPEN methodArguments* PARENTHESIS_CLOSE OE_END
+             */
+            logger.debug("enterArgsOutputExpression()");
+            super.enterArgsOutputExpression(ctx);
+        }
+
+        @Override
+        public void exitArgsOutputExpression(RythmParser.ArgsOutputExpressionContext ctx) {
+            logger.debug("exitArgsOutputExpression()");
+            super.enterArgsOutputExpression(ctx);
+        }
+
+        @Override
+        public void enterComplexOutputExpression(RythmParser.ComplexOutputExpressionContext ctx) {
+            /*
+             * AT COE_START IDENTIFIER DOT canonicalName PARENTHESIS_OPEN methodArguments* PARENTHESIS_CLOSE COE_END
+             */
+            logger.debug("enterComplexOutputExpression()");
+            super.enterComplexOutputExpression(ctx);
+        }
+
+        @Override
+        public void exitComplexOutputExpression(RythmParser.ComplexOutputExpressionContext ctx) {
+            logger.debug("exitComplexOutputExpression()");
+            super.exitComplexOutputExpression(ctx);
+        }
+
+
+        @Override
+        public void enterOutputExpressionPlaceholder(RythmParser.OutputExpressionPlaceholderContext ctx) {
+            logger.debug("enterOutputExpressionPlaceholder()");
+            super.enterOutputExpressionPlaceholder(ctx);
+            final String placeHolderName = stack.pop();
+            this.flow.append(String.format("\tthis.sb.append(%s.toString());%n", placeHolderName));
+        }
+
+        @Override
+        public void exitOutputExpressionPlaceholder(RythmParser.OutputExpressionPlaceholderContext ctx) {
+            logger.debug("exitOutputExpressionPlaceholder()");
+            super.exitOutputExpressionPlaceholder(ctx);
         }
 
         @Override
@@ -693,10 +791,9 @@ public class Java7SourceGenerator implements ISourceGenerator {
         }
 
         private String getClassName(String className) {
-            final String[] packageNames = { "java.lang", "java.util" };
             if (!className.contains(".")) {
                 for (String packageName : packageNames) {
-                    final String fqqn = String.format("%s.%s", packageName, className);
+                    final String fqqn = String.format("%s%s", packageName, className);
                     try {
                         Class.forName(fqqn, false, classLoader);
                     } catch (ClassNotFoundException e) {

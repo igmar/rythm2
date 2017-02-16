@@ -15,7 +15,7 @@
  */
 package org.rythmengine.internal.compiler;
 
-import org.rythmengine.internal.IHttpContext;
+import org.rythmengine.IHttpContext;
 import org.rythmengine.internal.exceptions.RythmTemplateException;
 import org.rythmengine.internal.hash.sha1.SHA1;
 import org.rythmengine.internal.parser.ParsedTemplate;

@@ -11,6 +11,9 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 
 public class TestBase {
+    public TestBase() {
+    }
+
     public InputStream loadTemplate(String template) {
         InputStream tpl = this.getClass().getClassLoader().getResourceAsStream(template);
         if (tpl == null) {

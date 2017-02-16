@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.rythmengine.RythmEngine;
 import org.rythmengine.TestBase;
 import org.rythmengine.conf.RythmConfiguration;
-import org.rythmengine.internal.IHttpContext;
+import org.rythmengine.IHttpContext;
 import org.rythmengine.internal.compiler.CompiledTemplate;
 
 import java.io.InputStream;

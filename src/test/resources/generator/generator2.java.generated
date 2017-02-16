@@ -2,32 +2,35 @@ package rythmengine.compiled;
 
 import java.util.Map;
 import java.lang.StringBuffer;
-import org.rythmengine.internal.*;
+import org.rythmengine.IHttpContext;
+import org.rythmengine.template.TemplateBase;
 import org.rythmengine.exceptions.RythmTemplateRuntimeException;
 import org.rythmengine.template.TemplateBase;
 
 
+import java.lang.Boolean;
+import java.lang.String;
 
 
 public final class ct_generator_generator2_html extends TemplateBase {
     private final StringBuffer sb;
-	private Boolean foo;
-	private Boolean bar;
-	private String gecko;
+	private java.lang.Boolean foo;
+	private java.lang.Boolean bar;
+	private java.lang.String gecko;
 
     public ct_generator_generator2_html(final IHttpContext httpContext, final Map<String, Object> args) {
         super(httpContext, args);
         this.sb = new StringBuffer();
-		this.foo = (Boolean) args.get("foo");
-		this.bar = (Boolean) args.get("bar");
-		this.gecko = (String) args.get("gecko");
+		this.foo = (java.lang.Boolean) args.get("foo");
+		this.bar = (java.lang.Boolean) args.get("bar");
+		this.gecko = (java.lang.String) args.get("gecko");
 
     }
 
     @Override
     public String execute() {
 		templatedata_3();
-for (int foo=0; foo<10; foo++)	{
+for (int foo=0; foo<10; foo++) {
 		templatedata_5();
 		}
 		templatedata_6();

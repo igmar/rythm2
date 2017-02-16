@@ -2,7 +2,8 @@ package @@PACKAGE@@;
 
 import java.util.Map;
 import java.lang.StringBuffer;
-import org.rythmengine.internal.*;
+import org.rythmengine.IHttpContext;
+import org.rythmengine.template.TemplateBase;
 import org.rythmengine.exceptions.RythmTemplateRuntimeException;
 import org.rythmengine.template.TemplateBase;
 

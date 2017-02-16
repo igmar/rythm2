@@ -16,7 +16,7 @@
 package org.rythmengine.template;
 
 import org.rythmengine.exceptions.RythmTemplateRuntimeException;
-import org.rythmengine.internal.IHttpContext;
+import org.rythmengine.IHttpContext;
 
 import java.util.Map;
 

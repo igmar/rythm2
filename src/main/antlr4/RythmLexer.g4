@@ -145,17 +145,17 @@ UNDERSCORE:                 '_'                         ;
 ARGS_END:                   [\r\n]                      { args_started }? { args_started = false; }-> mode(DEFAULT_MODE);
 EOL:                        [\r\n]                      -> channel(HIDDEN);
 WS:                         [\t ]                       -> channel(HIDDEN);
-IDENTIFIER:                 [a-zA-Z$_][a-zA-Z0-9$_]+    ;
+IDENTIFIER:                 [a-zA-Z$_][a-zA-Z0-9$_]*    ;
 
 mode OUTPUT_EXPRESSION;
 OE_ARGS_PARENTHESIS_OPEN:   '('                         { setType(PARENTHESIS_OPEN); } -> pushMode(OUTPUT_EXPRESSION_ARGS);
 OE_COMMA:                   ','                         { setType(COMMA); };
 OE_DOT:                     '.'                         { setType(DOT); };
-OE_IDENTIFIER:              [a-zA-Z$_][a-zA-Z0-9$_]+    { setType(IDENTIFIER); };
+OE_IDENTIFIER:              [a-zA-Z$_][a-zA-Z0-9$_]*    { setType(IDENTIFIER); };
 OE_END:                     .                           -> mode(DEFAULT_MODE);
 
 mode OUTPUT_EXPRESSION_ARGS;
-OE_ARGS_IDENTIFIER:         [a-zA-Z$_][a-zA-Z0-9$_]+    { setType(IDENTIFIER); };
+OE_ARGS_IDENTIFIER:         [a-zA-Z$_][a-zA-Z0-9$_]*    { setType(IDENTIFIER); };
 OE_ARGS_COMMA:              ','                         { setType(COMMA); };
 OE_ARGS_WS:                 [ \t\r\n]+                  -> channel(HIDDEN);
 OE_ARGS_PARENTHESIS_CLOSE:  ')'                         { setType(PARENTHESIS_CLOSE); } -> popMode;

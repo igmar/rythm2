@@ -52,4 +52,18 @@ public class GeneratorJava7Test extends TestBase {
 
         assertEquals(expected, actual);
     }
+
+    @Test
+    public void generatorTest4() {
+        RythmConfiguration config = createRythmConfiguration();
+        RythmEngine engine = new RythmEngine(config);
+
+        InputStream is = loadTemplate("generator/generator4.html");
+        System.out.println("Loaded ");
+        String expected = loadFileRaw("generator/generator4.java.generated");
+        CompiledTemplate result = engine.compile("generator/generator4.html", is);
+        String actual = result.source();
+
+        assertEquals(expected, actual);
+    }
 }

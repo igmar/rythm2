@@ -15,7 +15,8 @@
  */
 package org.rythmengine.internal.logger;
 
-import org.rythmengine.internal.ILogger;
+import org.rythmengine.ILogger;
+import org.rythmengine.LoggerLevel;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,10 +24,13 @@ import java.util.logging.Logger;
 public final class JDKLogger implements ILogger {
     private final Logger logger;
     private final String className;
+    private LoggerLevel loggerLevel;
 
-    public JDKLogger(Class<?> c) {
+    public JDKLogger(Class<?> c, LoggerLevel logLevel) {
         className = c.getName();
         logger = Logger.getLogger(className);
+        logger.setLevel(LoggerLevelConverter(logLevel));
+        this.loggerLevel = logLevel;
     }
 
     @Override
@@ -123,6 +127,25 @@ public final class JDKLogger implements ILogger {
                 // ignore
             }
             logger.logp(l, className, null, m);
+        }
+    }
+
+    private Level LoggerLevelConverter(LoggerLevel loggerLevel) {
+        switch (loggerLevel) {
+            case OFF:
+                return Level.OFF;
+            case SEVERE:
+                return Level.SEVERE;
+            case WARNING:
+                return Level.WARNING;
+            case INFO:
+                return Level.INFO;
+            case DEBUG:
+                return Level.FINE;
+            case TRACE:
+                return Level.FINEST;
+            default:
+                return Level.INFO;
         }
     }
 }

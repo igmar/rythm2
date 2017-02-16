@@ -19,8 +19,6 @@ import org.apache.commons.io.IOUtils;
 import org.rythmengine.conf.RythmConfiguration;
 import org.rythmengine.conf.RythmEngineMode;
 import org.rythmengine.conf.RythmGenerator;
-import org.rythmengine.internal.IHttpContext;
-import org.rythmengine.internal.ILogger;
 import org.rythmengine.internal.IResourceLoader;
 import org.rythmengine.internal.compiler.CompiledTemplate;
 import org.rythmengine.internal.compiler.jdk7.JDK7TemplateCompiler;

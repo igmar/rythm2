@@ -16,7 +16,7 @@
 package org.rythmengine.internal.compiler.jdk7;
 
 import org.rythmengine.conf.RythmConfiguration;
-import org.rythmengine.internal.ILogger;
+import org.rythmengine.ILogger;
 import org.rythmengine.internal.compiler.CompiledTemplate;
 import org.rythmengine.internal.compiler.TemplateCompiler;
 import org.rythmengine.internal.exceptions.RythmCompileException;

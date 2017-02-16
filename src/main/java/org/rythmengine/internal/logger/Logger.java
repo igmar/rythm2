@@ -15,7 +15,8 @@
  */
 package org.rythmengine.internal.logger;
 
-import org.rythmengine.internal.ILogger;
+import org.rythmengine.ILogger;
+import org.rythmengine.LoggerLevel;
 import org.rythmengine.internal.exceptions.RythmConfigException;
 
 import java.lang.reflect.InvocationTargetException;
@@ -29,11 +30,11 @@ public final class Logger {
     private Logger() {
     }
 
-    public static synchronized ILogger get(Class<?> c) {
+    public static synchronized  ILogger get(Class<?> c, LoggerLevel logLevel) {
         ILogger logger = loggers.get(c);
         if (logger == null) {
             try {
-                logger = loggerClass.getDeclaredConstructor(Class.class).newInstance(c);
+                logger = loggerClass.getDeclaredConstructor(Class.class, LoggerLevel.class).newInstance(c, logLevel);
             } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 // Needs a constructor with Class<?> argument
                 throw new RythmConfigException(e);
@@ -43,7 +44,11 @@ public final class Logger {
         return logger;
     }
 
-    public static void register(Class<JDKLogger> lc) {
+    public static ILogger get(Class<?> c) {
+        return get(c, LoggerLevel.DEBUG);
+    }
+
+    public static void register(Class<? extends ILogger> lc) {
         loggerClass = lc;
     }
 
