@@ -24,7 +24,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.rythmengine.conf.RythmConfiguration;
-import org.rythmengine.ILogger;
 import org.rythmengine.internal.exceptions.RythmGenerateException;
 import org.rythmengine.internal.exceptions.RythmParserException;
 import org.rythmengine.internal.fifo.FIFO;
@@ -32,9 +31,10 @@ import org.rythmengine.internal.fifo.LinkedFIFO;
 import org.rythmengine.internal.generator.GeneratedTemplateSource;
 import org.rythmengine.internal.generator.ISourceGenerator;
 import org.rythmengine.internal.hash.sha1.SHA1;
-import org.rythmengine.internal.logger.Logger;
 import org.rythmengine.internal.parser.RythmParser;
 import org.rythmengine.internal.parser.RythmParserBaseListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,7 +47,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class Java7SourceGenerator implements ISourceGenerator {
-    private static ILogger logger = Logger.get(Java7SourceGenerator.class);
+    private static Logger logger = LoggerFactory.getLogger(Java7SourceGenerator.class);
     private static final String[] packageNames = { "java.lang.", "java.util." };
 
     private final RythmConfiguration configuration;
@@ -66,7 +66,7 @@ public class Java7SourceGenerator implements ISourceGenerator {
             throw new RythmParserException("Internal error : Bad arguments");
         }
 
-        logger.debug("Generating source for %s", identifier);
+        logger.debug("Generating source for {}", identifier);
 
         /*
          * We create a new parser / listener on every run : The classes aren't threadsafe

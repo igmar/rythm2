@@ -16,12 +16,8 @@
 package org.rythmengine.conf;
 
 import org.apache.commons.lang3.StringUtils;
-import org.rythmengine.ILogger;
 import org.rythmengine.internal.IResourceLoader;
 import org.rythmengine.internal.exceptions.RythmConfigException;
-import org.rythmengine.internal.logger.ConsoleLogger;
-import org.rythmengine.internal.logger.JDKLogger;
-import org.rythmengine.internal.logger.Logger;
 import org.rythmengine.internal.resourceloader.DefaultResourceLoaderProvider;
 
 import javax.inject.Provider;
@@ -125,7 +121,6 @@ public final class RythmConfiguration {
             this.sourceGenerator = RythmGenerator.JDK7;
             this.compiler = RythmCompiler.JDT;
             this.compiledPackage = "rythmengine.compiled";
-            Logger.register(ConsoleLogger.class);
         }
 
         public Builder id(final String id) {
@@ -183,14 +178,6 @@ public final class RythmConfiguration {
                 throw new RythmConfigException("resourceloader is null");
             }
             this.resourceLoaderProvider = provider;
-            return this;
-        }
-
-        public Builder withLogger(final ILogger logger) {
-            if (logger == null) {
-                throw new RythmConfigException("logger is null");
-            }
-            Logger.register(logger);
             return this;
         }
 

@@ -107,10 +107,16 @@
             <version>4.6.1</version>
         </dependency>
         <dependency>
-            <groupId>org.immutables</groupId>
-            <artifactId>value</artifactId>
-            <version>2.4.2</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.23</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.23</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -176,6 +182,20 @@
                 <configuration>
                     <findbugsXmlOutput>true</findbugsXmlOutput>
                     <xmlOutput>true</xmlOutput>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.19.1</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <java.util.logging.config.file>${basedir}/src/test/resources/logging.properties</java.util.logging.config.file>
+                        <org.slf4j.simpleLogger.defaultLogLevel>DEBUG</org.slf4j.simpleLogger.defaultLogLevel>
+                        <org.slf4j.simpleLogger.showDateTime>true</org.slf4j.simpleLogger.showDateTime>
+                        <org.slf4j.simpleLogger.showShortLogName>true</org.slf4j.simpleLogger.showShortLogName>
+                        <org.slf4j.simpleLogger.showThreadName>false</org.slf4j.simpleLogger.showThreadName>
+                        <org.slf4j.simpleLogger.levelInBrackets>true</org.slf4j.simpleLogger.levelInBrackets>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
         </plugins>
