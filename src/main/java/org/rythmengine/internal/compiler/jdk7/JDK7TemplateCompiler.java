@@ -16,12 +16,12 @@
 package org.rythmengine.internal.compiler.jdk7;
 
 import org.rythmengine.conf.RythmConfiguration;
-import org.rythmengine.ILogger;
 import org.rythmengine.internal.compiler.CompiledTemplate;
 import org.rythmengine.internal.compiler.TemplateCompiler;
 import org.rythmengine.internal.exceptions.RythmCompileException;
-import org.rythmengine.internal.logger.Logger;
 import org.rythmengine.internal.parser.ParsedTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
@@ -40,7 +40,7 @@ import java.util.Locale;
 import java.util.Map;
 
 public class JDK7TemplateCompiler extends TemplateCompiler {
-    private static ILogger logger = Logger.get(JDK7TemplateCompiler.class);
+    private static Logger logger = LoggerFactory.getLogger(JDK7TemplateCompiler.class);
     private JavaCompiler compiler;
 
     public JDK7TemplateCompiler(final RythmConfiguration configuration, final List<ParsedTemplate> parsedTemplates, final
@@ -70,7 +70,7 @@ public class JDK7TemplateCompiler extends TemplateCompiler {
         final DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
         final List<JavaSource> units = new ArrayList<>();
         for (ParsedTemplate pt : this.sources) {
-            logger.debug("Adding class for compilation : %s%n", pt.getName());
+            logger.debug("Adding class for compilation : {}", pt.getName());
             units.add(new JavaSource(pt));
         }
 

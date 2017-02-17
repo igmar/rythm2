@@ -27,9 +27,10 @@ import org.rythmengine.internal.exceptions.RythmConfigException;
 import org.rythmengine.internal.generator.ISourceGenerator;
 import org.rythmengine.internal.generator.java7.Java7SourceGenerator;
 import org.rythmengine.internal.hash.fnv.FNV;
-import org.rythmengine.internal.logger.Logger;
 import org.rythmengine.internal.parser.ParsedTemplate;
 import org.rythmengine.internal.parser.TemplateParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -49,27 +50,27 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public final class RythmEngine implements AutoCloseable {
+    private static Logger logger = LoggerFactory.getLogger(RythmEngine.class);
+
     private static final Integer DEFAULT_TIMEOUT = 5;
     private RythmConfiguration configuration;
     private String id;
     private ExecutorService compilePool;
     private ExecutorService parsePool;
     private ConcurrentMap<String, CompiledTemplate> templates;
-    private ILogger iLogger;
     private ISourceGenerator sourceGenerator;
     private ClassLoader classLoader;
 
     public RythmEngine(final RythmConfiguration configuration, final ClassLoader classLoader) {
         this.configuration = configuration;
         this.id = configuration.getId();
-        this.iLogger = Logger.get(RythmEngine.class);
         this.sourceGenerator = getSourceGenerator(this.configuration.getSourceGenerator());
         compilePool = Executors.newCachedThreadPool();
         parsePool = Executors.newCachedThreadPool();
         templates = new ConcurrentHashMap<>();
         this.classLoader = classLoader == null ? Thread.currentThread().getContextClassLoader() : classLoader;
 
-        iLogger.info("Starting RythmEngine %s", this.id);
+        logger.info("Starting RythmEngine {}", this.id);
     }
 
     public RythmEngine(final RythmConfiguration configuration) {
