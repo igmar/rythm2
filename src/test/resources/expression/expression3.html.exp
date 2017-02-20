@@ -1,1 +1,1 @@
-(template (elements (templatedata (templatedataelement Some text\n))) (elements (outputExpression (complexOutputExpression @ ( foo . (canonicalName bar) ( ) )))) (elements (templatedata (templatedataelement more text\nFoo text\n))))
+(template (elements (templatedata (templatedataelement Some text\n))) (elements (outputExpression (complicatedExpression @ ( foo (outputExpressionDereference . (canonicalName bar) ( )) )))) (elements (templatedata (templatedataelement more text\nFoo text\n))))

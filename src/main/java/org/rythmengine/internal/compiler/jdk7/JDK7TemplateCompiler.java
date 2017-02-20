@@ -104,7 +104,7 @@ public class JDK7TemplateCompiler extends TemplateCompiler {
                         break;
                 }
             }
-            logger.error("%s", sb.toString());
+            logger.error("{}", sb.toString());
             throw new RythmCompileException(sb.toString());
         }
 

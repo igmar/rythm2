@@ -1,0 +1,1 @@
+(template (elements (outputExpression (complicatedExpression @ ( foo (outputExpressionDereference . (canonicalName bar) ( (methodArguments (methodArgumentIndentifier " abcd ")) )) (outputExpressionDereference . (canonicalName toUpperCase) ( )) )))) (elements (templatedata (templatedataelement \n))))

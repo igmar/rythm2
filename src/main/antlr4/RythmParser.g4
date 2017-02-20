@@ -66,21 +66,32 @@ flow_for
 
 outputExpression
     : simpleOutputExpression
-    | argsOutputExpression
-    | complexOutputExpression
+    | complicatedExpression
     ;
 
 simpleOutputExpression
-    : AT OE_START (DOT canonicalName)* OE_END
+    : AT IDENTIFIER (outputExpressionDereference)* OE_END
     ;
 
-argsOutputExpression
-    : AT OE_START DOT canonicalName PARENTHESIS_OPEN methodArguments* PARENTHESIS_CLOSE OE_END
+complicatedExpression
+    : AT COE_START IDENTIFIER (outputExpressionDereference)* COE_END
     ;
 
-complexOutputExpression
-    : AT COE_START IDENTIFIER DOT canonicalName PARENTHESIS_OPEN methodArguments* PARENTHESIS_CLOSE COE_END
+outputExpressionDereference
+    : DOT canonicalName
+    | DOT canonicalName PARENTHESIS_OPEN methodArguments* PARENTHESIS_CLOSE
     ;
+
+
+methodArguments
+    : methodArgumentIndentifier (COMMA methodArgumentIndentifier)*
+    ;
+
+methodArgumentIndentifier
+    : DOUBLE_QUOTE IDENTIFIER DOUBLE_QUOTE
+    | IDENTIFIER
+    ;
+
 
 outputExpressionPlaceholder
     : AT UOE_START OE_END
@@ -101,10 +112,6 @@ macro
 
 include
     : AT INCLUDE_START PARENTHESIS_OPEN DOUBLE_QUOTE? canonicalName DOUBLE_QUOTE? PARENTHESIS_CLOSE
-    ;
-
-methodArguments
-    : IDENTIFIER (COMMA IDENTIFIER)*
     ;
 
 block

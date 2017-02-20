@@ -258,6 +258,11 @@ public class Java7SourceGenerator implements ISourceGenerator {
                 final String genericFQN = getClassName(genericType);
                 final String boxedFQN = boxedType != null ? getClassName(boxedType) : null;
 
+                // FIXME : Proper error. Class not found @ arg.javaGenericType().qualifiedName(0)
+                if (genericFQN == null) {
+                    throw new RythmParserException("");
+                }
+
                 try {
                     /* These are always on the source line */
                     final Class<?> typeRef = Class.forName(genericFQN);
@@ -392,126 +397,6 @@ public class Java7SourceGenerator implements ISourceGenerator {
         }
 
         @Override
-        public void enterIntegerLiteral(RythmParser.IntegerLiteralContext ctx) {
-            super.enterIntegerLiteral(ctx);
-        }
-
-        @Override
-        public void exitIntegerLiteral(RythmParser.IntegerLiteralContext ctx) {
-            super.exitIntegerLiteral(ctx);
-        }
-
-        @Override
-        public void enterBooleanLiteral(RythmParser.BooleanLiteralContext ctx) {
-            super.enterBooleanLiteral(ctx);
-        }
-
-        @Override
-        public void exitBooleanLiteral(RythmParser.BooleanLiteralContext ctx) {
-            super.exitBooleanLiteral(ctx);
-        }
-
-        @Override
-        public void enterDecimalIntegerLiteral(RythmParser.DecimalIntegerLiteralContext ctx) {
-            super.enterDecimalIntegerLiteral(ctx);
-        }
-
-        @Override
-        public void exitDecimalIntegerLiteral(RythmParser.DecimalIntegerLiteralContext ctx) {
-            super.exitDecimalIntegerLiteral(ctx);
-        }
-
-        @Override
-        public void enterDecimalNumeral(RythmParser.DecimalNumeralContext ctx) {
-            super.enterDecimalNumeral(ctx);
-        }
-
-        @Override
-        public void exitDecimalNumeral(RythmParser.DecimalNumeralContext ctx) {
-            super.exitDecimalNumeral(ctx);
-        }
-
-        @Override
-        public void enterDigits(RythmParser.DigitsContext ctx) {
-            super.enterDigits(ctx);
-        }
-
-        @Override
-        public void exitDigits(RythmParser.DigitsContext ctx) {
-            super.exitDigits(ctx);
-        }
-
-        @Override
-        public void enterDigitOrUnderscore(RythmParser.DigitOrUnderscoreContext ctx) {
-            super.enterDigitOrUnderscore(ctx);
-        }
-
-        @Override
-        public void exitDigitOrUnderscore(RythmParser.DigitOrUnderscoreContext ctx) {
-            super.exitDigitOrUnderscore(ctx);
-        }
-
-        @Override
-        public void enterDigit(RythmParser.DigitContext ctx) {
-            super.enterDigit(ctx);
-        }
-
-        @Override
-        public void exitDigit(RythmParser.DigitContext ctx) {
-            super.exitDigit(ctx);
-        }
-
-        @Override
-        public void enterUnderScores(RythmParser.UnderScoresContext ctx) {
-            super.enterUnderScores(ctx);
-        }
-
-        @Override
-        public void exitUnderScores(RythmParser.UnderScoresContext ctx) {
-            super.exitUnderScores(ctx);
-        }
-
-        @Override
-        public void enterHexIntegerLiteral(RythmParser.HexIntegerLiteralContext ctx) {
-            super.enterHexIntegerLiteral(ctx);
-        }
-
-        @Override
-        public void exitHexIntegerLiteral(RythmParser.HexIntegerLiteralContext ctx) {
-            super.exitHexIntegerLiteral(ctx);
-        }
-
-        @Override
-        public void enterHexNumeral(RythmParser.HexNumeralContext ctx) {
-            super.enterHexNumeral(ctx);
-        }
-
-        @Override
-        public void exitHexNumeral(RythmParser.HexNumeralContext ctx) {
-            super.exitHexNumeral(ctx);
-        }
-
-        @Override
-        public void enterHexDigits(RythmParser.HexDigitsContext ctx) {
-            super.enterHexDigits(ctx);
-        }
-
-        @Override
-        public void exitHexDigits(RythmParser.HexDigitsContext ctx) {
-            super.exitHexDigits(ctx);
-        }
-
-        @Override
-        public void enterIntegerTypeSuffix(RythmParser.IntegerTypeSuffixContext ctx) {
-            super.enterIntegerTypeSuffix(ctx);
-        }
-
-        @Override
-        public void exitIntegerTypeSuffix(RythmParser.IntegerTypeSuffixContext ctx) {
-            super.exitIntegerTypeSuffix(ctx);
-        }
-
-        @Override
         public void enterComment(RythmParser.CommentContext ctx) {
             logger.debug("enterComment()");
             super.enterComment(ctx);
@@ -536,26 +421,6 @@ public class Java7SourceGenerator implements ISourceGenerator {
         }
 
         @Override
-        public void enterQualifiedName(RythmParser.QualifiedNameContext ctx) {
-            super.enterQualifiedName(ctx);
-        }
-
-        @Override
-        public void exitQualifiedName(RythmParser.QualifiedNameContext ctx) {
-            super.exitQualifiedName(ctx);
-        }
-
-        @Override
-        public void enterEveryRule(ParserRuleContext ctx) {
-            super.enterEveryRule(ctx);
-        }
-
-        @Override
-        public void exitEveryRule(ParserRuleContext ctx) {
-            super.exitEveryRule(ctx);
-        }
-
-        @Override
         public void enterTemplate(RythmParser.TemplateContext ctx) {
             logger.debug("enterTemplate()");
             super.enterTemplate(ctx);
@@ -568,7 +433,7 @@ public class Java7SourceGenerator implements ISourceGenerator {
             logger.debug("exitTemplate()");
             super.exitTemplate(ctx);
 
-            // TODO : Write post-parse actions
+            // FIXME : Write post-parse actions
             // We need to check which of the args are referenced, so that we can put in proper check to prevent NPE's
         }
 
@@ -611,16 +476,6 @@ public class Java7SourceGenerator implements ISourceGenerator {
         }
 
         @Override
-        public void enterTemplatedataelement(RythmParser.TemplatedataelementContext ctx) {
-            super.enterTemplatedataelement(ctx);
-        }
-
-        @Override
-        public void exitTemplatedataelement(RythmParser.TemplatedataelementContext ctx) {
-            super.exitTemplatedataelement(ctx);
-        }
-
-        @Override
         public void enterFlow_if(RythmParser.Flow_ifContext ctx) {
             logger.debug("enterFlow_if()");
             super.enterFlow_if(ctx);
@@ -632,7 +487,6 @@ public class Java7SourceGenerator implements ISourceGenerator {
         public void exitFlow_if(RythmParser.Flow_ifContext ctx) {
             logger.debug("exitFlow_if()");
             super.exitFlow_if(ctx);
-
         }
 
         @Override
@@ -675,15 +529,15 @@ public class Java7SourceGenerator implements ISourceGenerator {
         @Override
         public void enterSimpleOutputExpression(RythmParser.SimpleOutputExpressionContext ctx) {
             /*
-             * AT OE_START (DOT canonicalName)? OE_END
+             * AT IDENTIFIER (outputExpressionDereference)* OE_END
              */
             logger.debug("enterSimpleOutputExpression()");
             super.enterSimpleOutputExpression(ctx);
 
-            String varName = ctx.OE_START().getText();
-            if (ctx.canonicalName().size() > 0) {
-                for (RythmParser.CanonicalNameContext cc : ctx.canonicalName()) {
-                    varName = varName + "." + cc.getText();
+            String varName = ctx.IDENTIFIER().getText();
+            if (ctx.outputExpressionDereference().size() > 0) {
+                for (RythmParser.OutputExpressionDereferenceContext cc : ctx.outputExpressionDereference()) {
+                    varName = varName + cc.getText();
                 }
             }
             this.flow.append(String.format("\tthis.sb.append(%s.toString());%n", varName));
@@ -696,33 +550,27 @@ public class Java7SourceGenerator implements ISourceGenerator {
         }
 
         @Override
-        public void enterArgsOutputExpression(RythmParser.ArgsOutputExpressionContext ctx) {
+        public void enterComplicatedExpression(RythmParser.ComplicatedExpressionContext ctx) {
             /*
-             * AT OE_START DOT canonicalName PARENTHESIS_OPEN methodArguments* PARENTHESIS_CLOSE OE_END
+             * AT COE_START IDENTIFIER (outputExpressionDereference)* COE_END
              */
-            logger.debug("enterArgsOutputExpression()");
-            super.enterArgsOutputExpression(ctx);
+            logger.debug("enterComplicatedExpression()");
+            super.enterComplicatedExpression(ctx);
+
+            String varName = ctx.IDENTIFIER().getText();
+
+            if (ctx.outputExpressionDereference().size() > 0) {
+                for (RythmParser.OutputExpressionDereferenceContext cc : ctx.outputExpressionDereference()) {
+                    varName = varName + cc.getText();
+                }
+            }
+            this.flow.append(String.format("\tthis.sb.append(%s.toString());%n", varName));
         }
 
         @Override
-        public void exitArgsOutputExpression(RythmParser.ArgsOutputExpressionContext ctx) {
-            logger.debug("exitArgsOutputExpression()");
-            super.enterArgsOutputExpression(ctx);
-        }
-
-        @Override
-        public void enterComplexOutputExpression(RythmParser.ComplexOutputExpressionContext ctx) {
-            /*
-             * AT COE_START IDENTIFIER DOT canonicalName PARENTHESIS_OPEN methodArguments* PARENTHESIS_CLOSE COE_END
-             */
-            logger.debug("enterComplexOutputExpression()");
-            super.enterComplexOutputExpression(ctx);
-        }
-
-        @Override
-        public void exitComplexOutputExpression(RythmParser.ComplexOutputExpressionContext ctx) {
-            logger.debug("exitComplexOutputExpression()");
-            super.exitComplexOutputExpression(ctx);
+        public void exitComplicatedExpression(RythmParser.ComplicatedExpressionContext ctx) {
+            logger.debug("enterComplicatedExpression()");
+            super.exitComplicatedExpression(ctx);
         }
 
 

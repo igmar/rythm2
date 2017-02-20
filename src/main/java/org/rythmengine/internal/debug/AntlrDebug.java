@@ -23,6 +23,10 @@ import org.rythmengine.internal.parser.RythmLexer;
 
 import java.util.List;
 
+/**
+ * This class has static method that support debugging the Antlr parser
+ * Don't use this on production code
+ */
 public final class AntlrDebug {
     private AntlrDebug() {
     }

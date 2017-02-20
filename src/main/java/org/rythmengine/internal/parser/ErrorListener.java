@@ -9,6 +9,7 @@ public class ErrorListener extends BaseErrorListener {
     @Override
     public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) throws RythmParserException {
         // FIXME Generate a decent error message
-        throw new RythmParserException();
+        final String message = "line " + line + ":" + charPositionInLine + " " + msg;
+        throw new RythmParserException(message);
     }
 }

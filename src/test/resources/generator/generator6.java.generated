@@ -11,11 +11,11 @@ import org.rythmengine.template.TemplateBase;
 import org.rythmengine.pojo.FooBar;
 
 
-public final class ct_generator_generator5_html extends TemplateBase {
+public final class ct_generator_generator6_html extends TemplateBase {
     private final StringBuffer sb;
 	private org.rythmengine.pojo.FooBar foo;
 
-    public ct_generator_generator5_html(final IHttpContext httpContext, final Map<String, Object> args) {
+    public ct_generator_generator6_html(final IHttpContext httpContext, final Map<String, Object> args) {
         super(httpContext, args);
         this.sb = new StringBuffer();
 		this.foo = (org.rythmengine.pojo.FooBar) args.get("foo");
@@ -25,7 +25,8 @@ public final class ct_generator_generator5_html extends TemplateBase {
     @Override
     public String execute() {
 		templatedata_2();
-	this.sb.append(foo.bar("dcba").foobar.toString());
+	this.sb.append(foo.bar("abcd").foobar.toString());
+		templatedata_3();
 
         return this.sb.toString();
     }
@@ -35,12 +36,13 @@ public final class ct_generator_generator5_html extends TemplateBase {
     }
 
 	private void templatedata_2() {		this.sb.append("\n");	}
+	private void templatedata_3() {		this.sb.append("\n");	}
 
 }
 /*
     -- GENERATED --
-    PATH   : generator/generator5.html
-    SHA1   : 2b370650792e38972d8749aa6ef44324f8c94045
+    PATH   : generator/generator6.html
+    SHA1   : 0b87895aa45bb60c3d39095e2a26f3f97f2534ab
     LINES  : 
     MATRIX : 
     ---------------

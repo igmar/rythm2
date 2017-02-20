@@ -84,7 +84,7 @@ INCLUDE_START:              'include'                   -> mode(RYTHM);
 MACRO_BLOCK_START:          'macro'                     { block_nesting++; } -> mode(RYTHM);
 RETURN_START:               'return'                    -> mode(DEFAULT_MODE);
 RETURN_IF_START:            'returnIf('                 { return_if_started = true; } -> mode(RYTHM);
-OE_START:                   [a-zA-Z][a-zA-Z0-9$_]+      -> mode(OUTPUT_EXPRESSION);
+OE_START:                   [a-zA-Z$_][a-zA-Z0-9$_]+    { setType(IDENTIFIER); } -> mode(OUTPUT_EXPRESSION);
 UOE_START:                  '_'                         -> mode(OUTPUT_EXPRESSION);
 
 mode RYTHM;
@@ -158,6 +158,7 @@ mode OUTPUT_EXPRESSION_ARGS;
 OE_ARGS_IDENTIFIER:         [a-zA-Z$_][a-zA-Z0-9$_]*    { setType(IDENTIFIER); };
 OE_ARGS_COMMA:              ','                         { setType(COMMA); };
 OE_ARGS_WS:                 [ \t\r\n]+                  -> channel(HIDDEN);
+OE_ARGS_DOUBLE_QUOTE:       '"'                         { setType(DOUBLE_QUOTE); };
 OE_ARGS_PARENTHESIS_CLOSE:  ')'                         { setType(PARENTHESIS_CLOSE); } -> popMode;
 
 mode LINE_COMMENT;
