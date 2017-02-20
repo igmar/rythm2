@@ -1,0 +1,1 @@
+(template (elements (outputExpression (simpleOutputExpression @ foo (outputExpressionDereference . (canonicalName bar) ( )) (outputExpressionDereference . (canonicalName toUpperCase) ( )) \n))))

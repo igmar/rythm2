@@ -25,6 +25,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.rythmengine.internal.IResourceLoader;
+import org.rythmengine.internal.debug.AntlrDebug;
 import org.rythmengine.internal.exceptions.RythmGenerateException;
 import org.rythmengine.internal.exceptions.RythmParserException;
 import org.rythmengine.internal.generator.ISourceGenerator;
@@ -77,6 +78,8 @@ public final class TemplateParser implements Callable<ParsedTemplate> {
             IOException {
         CharStream cs = new ANTLRInputStream(input);
         org.rythmengine.internal.parser.RythmLexer lexer = new org.rythmengine.internal.parser.RythmLexer(cs);
+        lexer.removeErrorListeners();
+        lexer.addErrorListener(new ErrorListener());
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
         tokenStream.fill();
         List<Token> tokens = tokenStream.getTokens();
@@ -91,7 +94,7 @@ public final class TemplateParser implements Callable<ParsedTemplate> {
             System.err.println(e);
             throw new RuntimeException("Reflection failed");
         }
-
+        
         org.rythmengine.internal.parser.RythmParser parser = new org.rythmengine.internal.parser.RythmParser(tokenStream);
         parser.setResourceLoader(resourceLoader);
         parser.removeErrorListeners();

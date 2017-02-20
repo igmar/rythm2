@@ -1,0 +1,48 @@
+package rythmengine.compiled;
+
+import java.util.Map;
+import java.lang.StringBuffer;
+import org.rythmengine.IHttpContext;
+import org.rythmengine.template.TemplateBase;
+import org.rythmengine.exceptions.RythmTemplateRuntimeException;
+import org.rythmengine.template.TemplateBase;
+
+
+import org.rythmengine.pojo.FooBar;
+
+
+public final class ct_generator_generator5_html extends TemplateBase {
+    private final StringBuffer sb;
+	private org.rythmengine.pojo.FooBar foo;
+
+    public ct_generator_generator5_html(final IHttpContext httpContext, final Map<String, Object> args) {
+        super(httpContext, args);
+        this.sb = new StringBuffer();
+		this.foo = (org.rythmengine.pojo.FooBar) args.get("foo");
+
+    }
+
+    @Override
+    public String execute() {
+		templatedata_2();
+	this.sb.append(foo.bar("dcba").foobar.toString());
+
+        return this.sb.toString();
+    }
+
+    private void emitAt() {
+        sb.append("@");
+    }
+
+	private void templatedata_2() {		this.sb.append("\n");	}
+
+}
+/*
+    -- GENERATED --
+    PATH   : generator/generator5.html
+    SHA1   : 2b370650792e38972d8749aa6ef44324f8c94045
+    LINES  : 
+    MATRIX : 
+    ---------------
+
+*/

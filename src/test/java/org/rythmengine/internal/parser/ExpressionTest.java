@@ -8,9 +8,6 @@ import java.io.InputStream;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Created by igmar on 20/07/16.
- */
 public class ExpressionTest extends TestBase {
     @Test
     public void testInstanceField() {
@@ -19,7 +16,6 @@ public class ExpressionTest extends TestBase {
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
         String actual = pt.toStringTree(parser);
-        assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals(expected, actual);
     }
 
@@ -30,7 +26,6 @@ public class ExpressionTest extends TestBase {
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
         String actual = pt.toStringTree(parser);
-        assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals(expected, actual);
     }
 
@@ -41,7 +36,6 @@ public class ExpressionTest extends TestBase {
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
         String actual = pt.toStringTree(parser);
-        assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals(expected, actual);
     }
 
@@ -52,7 +46,6 @@ public class ExpressionTest extends TestBase {
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
         String actual = pt.toStringTree(parser);
-        assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals(expected, actual);
     }
 
@@ -63,7 +56,6 @@ public class ExpressionTest extends TestBase {
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
         String actual = pt.toStringTree(parser);
-        assertEquals(0, parser.getNumberOfSyntaxErrors());
         assertEquals(expected, actual);
     }
 
@@ -74,7 +66,66 @@ public class ExpressionTest extends TestBase {
         org.rythmengine.internal.parser.RythmParser parser = createParser(is);
         ParseTree pt = parser.template();
         String actual = pt.toStringTree(parser);
-        assertEquals(0, parser.getNumberOfSyntaxErrors());
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testDoubleReferenceOutputExpression() {
+        InputStream is = loadTemplate("expression/expression7.html");
+        String expected = loadFile("expression/expression7.html.exp");
+        org.rythmengine.internal.parser.RythmParser parser = createParser(is);
+        ParseTree pt = parser.template();
+        String actual = pt.toStringTree(parser);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testDoubleMethodReferenceOutputExpression() {
+        InputStream is = loadTemplate("expression/expression8.html");
+        String expected = loadFile("expression/expression8.html.exp");
+        org.rythmengine.internal.parser.RythmParser parser = createParser(is);
+        ParseTree pt = parser.template();
+        String actual = pt.toStringTree(parser);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testDoubleMethodReferenceWithArgsOutputExpression() {
+        InputStream is = loadTemplate("expression/expression9.html");
+        String expected = loadFile("expression/expression9.html.exp");
+        org.rythmengine.internal.parser.RythmParser parser = createParser(is);
+        ParseTree pt = parser.template();
+        String actual = pt.toStringTree(parser);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testCOEDoubleMethodReferenceWithArgsOutputExpression() {
+        InputStream is = loadTemplate("expression/expression10.html");
+        String expected = loadFile("expression/expression10.html.exp");
+        org.rythmengine.internal.parser.RythmParser parser = createParser(is);
+        ParseTree pt = parser.template();
+        String actual = pt.toStringTree(parser);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testMixedDefeferenceOutputExpression1() {
+        InputStream is = loadTemplate("expression/expression11.html");
+        String expected = loadFile("expression/expression11.html.exp");
+        org.rythmengine.internal.parser.RythmParser parser = createParser(is);
+        ParseTree pt = parser.template();
+        String actual = pt.toStringTree(parser);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testMixedDefeferenceOutputExpression2() {
+        InputStream is = loadTemplate("expression/expression12.html");
+        String expected = loadFile("expression/expression12.html.exp");
+        org.rythmengine.internal.parser.RythmParser parser = createParser(is);
+        ParseTree pt = parser.template();
+        String actual = pt.toStringTree(parser);
         assertEquals(expected, actual);
     }
 }
